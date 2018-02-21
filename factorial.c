@@ -3,7 +3,7 @@ long factorial(int x);
 
 int main(void) {
 	int number; scanf("%d", &number);
-	printf("%d\n",factorial(number));
+	printf("%ld\n",factorial(number));
 	return 0;
 }
 
