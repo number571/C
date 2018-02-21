@@ -1,13 +1,13 @@
 #include <stdio.h>
 void bin(int num);
 int main(void) {
-	unsigned char number = 5;
+	unsigned char number;
+	scanf("%hhu",&number);
 	bin(number);
-	printf("%d\n", number);
 	return 0;
 }
 void bin(int num) {
-	printf("%d",  (num&0x80)?1:0); // 0x80 = 10000000 
+	printf("%d",  (num&0x80)?1:0); // 0x80 = 10000000
 	printf("%d",  (num&0x40)?1:0); // 0x40 = 01000000
 	printf("%d",  (num&0x20)?1:0); // 0x20 = 00100000
 	printf("%d",  (num&0x10)?1:0); // 0x10 = 00010000
