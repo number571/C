@@ -8,20 +8,8 @@
 
 #define ENDSTRING 1
 #define ENDCHAR '\0'
-
 #define SPACESTRING 1
 #define SPACECHAR ' '
-
-/* Operation System: Linux */
-#if __linux__ 
-
-#include <unistd.h>
-
-void clear(void) { system("clear"); }
-
-void pwd(void) { system("pwd"); }
-
-void uname(void) { system("uname -a"); }
 
 bool create(const char *file) {
 	FILE *ptrFile;
@@ -48,7 +36,7 @@ bool output(const char *file) {
 	FILE *ptrFile;
 	register char symbol;
 	if ((ptrFile = fopen(file, "r")) != NULL) {
-		while ((symbol = fgetc(ptrFile)) != EOF) 
+		while ((symbol = fgetc(ptrFile)) != EOF)
 			printf("%c", symbol);
 		fclose(ptrFile);
 		return true;
@@ -57,45 +45,13 @@ bool output(const char *file) {
 	}
 }
 
-#define PYTHON "python "
-#define PYTHONSIZE 7
+/* // For Linux\Windows OS // */
 
-void python(const char *path) {
-	const char pythonSymbols[PYTHONSIZE] = PYTHON;
-
-	const unsigned char lengthString = strlen(path);
-
-	char fullPath[PYTHONSIZE + lengthString + ENDSTRING];
-
-	for (unsigned char index = 0; index < PYTHONSIZE; fullPath[index++] = pythonSymbols[index]);
-	for (unsigned char index = PYTHONSIZE, twindex = 0; index <= PYTHONSIZE+lengthString; fullPath[index++] = path[twindex++]);
-
-	fullPath[PYTHONSIZE + lengthString] = ENDCHAR;
-
-	system(fullPath);
-}
-
-#define GCC "gcc "
-#define GCCSIZE 4
-
-void gcc(const char *path) {
-	const char gccSymbols[GCCSIZE] = GCC;
-
-	const unsigned char lengthString = strlen(path);
-
-	char fullPath[GCCSIZE + lengthString + ENDSTRING];
-
-	for (unsigned char index = 0; index < GCCSIZE; fullPath[index++] = gccSymbols[index]);
-	for (unsigned char index = GCCSIZE, twindex = 0; index <= GCCSIZE+lengthString; fullPath[index++] = path[twindex++]);
-
-	fullPath[GCCSIZE + lengthString] = ENDCHAR;
-
-	system(fullPath);
-}
+/* Start condition */
+#if defined(__linux__) || defined(__WIN32__)
 
 #define RUN "./"
 #define RUNSIZE 2
-
 void run(const char *path) {
 	const char runSymbols[RUNSIZE] = RUN;
 
@@ -113,7 +69,6 @@ void run(const char *path) {
 
 #define ECHO "echo "
 #define ECHOSIZE 5
-
 void echo(const char *path) {
 	const char echoSymbols[ECHOSIZE] = ECHO;
 
@@ -129,9 +84,59 @@ void echo(const char *path) {
 	system(fullPath);
 }
 
+#define DIR "dir "
+#define DIRSIZE 4
+void dir(const char *path) {
+	const char lsSymbols[DIRSIZE] = DIR;
+
+	const unsigned char lengthString = strlen(path);
+	
+	char fullPath[DIRSIZE + lengthString + ENDSTRING];
+
+	for (unsigned char index = 0; index < DIRSIZE; fullPath[index++] = lsSymbols[index]);
+	for (unsigned char index = DIRSIZE, twindex = 0; index <= DIRSIZE+lengthString; fullPath[index++] = path[twindex++]);
+
+	fullPath[DIRSIZE + lengthString] = ENDCHAR;
+
+	system(fullPath);
+}
+
+#define MKDIR "mkdir "
+#define MKDIRSIZE 6
+void mkdir(const char *path) {
+	const char mkdirSymbols[MKDIRSIZE] = MKDIR;
+
+	const unsigned char lengthString = strlen(path);
+
+	char fullPath[MKDIRSIZE + lengthString + ENDSTRING];
+
+	for (unsigned char index = 0; index < MKDIRSIZE; fullPath[index++] = mkdirSymbols[index]);
+	for (unsigned char index = MKDIRSIZE, twindex = 0; index <= MKDIRSIZE+lengthString; fullPath[index++] = path[twindex++]);
+
+	fullPath[MKDIRSIZE + lengthString] = ENDCHAR;
+
+	system(fullPath);
+}
+
+#endif 
+/* End condition */
+
+
+/* // Operation System: Linux // */
+
+/* Start condition */
+#if defined(__linux__)
+
+#include <unistd.h>
+
+void clear(void) { system("clear"); }
+
+void pwd(void) { system("pwd"); }
+
+void uname(void) { system("uname -a"); }
+
 #define TOUCH "touch "
 #define TOUCHSIZE 6
-
 void touch(const char *path) {
 	const char touchSymbols[TOUCHSIZE] = TOUCH;
 
@@ -149,7 +154,6 @@ void touch(const char *path) {
 
 #define CAT "cat "
 #define CATSIZE 4
-
 void cat(const char *path) {
 	const char catSymbols[CATSIZE] = CAT;
 
@@ -165,27 +169,8 @@ void cat(const char *path) {
 	system(fullPath);
 }
 
-#define MKDIR "mkdir "
-#define MKDIRSIZE 6
-
-void mkdir(const char *path) {
-	const char mkdirSymbols[MKDIRSIZE] = MKDIR;
-
-	const unsigned char lengthString = strlen(path);
-
-	char fullPath[MKDIRSIZE + lengthString + ENDSTRING];
-
-	for (unsigned char index = 0; index < MKDIRSIZE; fullPath[index++] = mkdirSymbols[index]);
-	for (unsigned char index = MKDIRSIZE, twindex = 0; index <= MKDIRSIZE+lengthString; fullPath[index++] = path[twindex++]);
-
-	fullPath[MKDIRSIZE + lengthString] = ENDCHAR;
-
-	system(fullPath);
-}
-
 #define FILE "file "
 #define FILESIZE 5
-
 void file(const char *path) {
 	const char fileSymbols[FILESIZE] = FILE;
 
@@ -203,7 +188,6 @@ void file(const char *path) {
 
 #define MV "mv "
 #define MVSIZE 3
-
 void mv(const char *pathOne, const char *pathTwo) {
 	const char mvSymbols[MVSIZE] = MV;
 
@@ -225,8 +209,7 @@ void mv(const char *pathOne, const char *pathTwo) {
 }
 
 #define CP "cp "
-#define CPSIZE 6
-
+#define CPSIZE 3
 void cp(const char *pathOne, const char *pathTwo) {
 	const char cpSymbols[CPSIZE] = CP;
 
@@ -249,7 +232,6 @@ void cp(const char *pathOne, const char *pathTwo) {
 
 #define RM "rm -rf "
 #define RMSIZE 7
-
 void rm(const char *path) {
 	const char rmSymbols[RMSIZE] = RM;
 
@@ -265,27 +247,8 @@ void rm(const char *path) {
 	system(fullPath);
 }
 
-#define DIR "dir "
-#define DIRSIZE 4
-
-void dir(const char *path) {
-	const char lsSymbols[DIRSIZE] = DIR;
-
-	const unsigned char lengthString = strlen(path);
-	
-	char fullPath[DIRSIZE + lengthString + ENDSTRING];
-
-	for (unsigned char index = 0; index < DIRSIZE; fullPath[index++] = lsSymbols[index]);
-	for (unsigned char index = DIRSIZE, twindex = 0; index <= DIRSIZE+lengthString; fullPath[index++] = path[twindex++]);
-
-	fullPath[DIRSIZE + lengthString] = ENDCHAR;
-
-	system(fullPath);
-}
-
 #define LS "ls -l "
 #define LSZISE 6
-
 void ls(const char *path) {
 	const char lsSymbols[LSZISE] = LS;
 
@@ -301,14 +264,15 @@ void ls(const char *path) {
 	system(fullPath);
 }
 
-/* Operation System: Windows */
-#elif __win32__ || __win64__
+/* // Operation System: Windows // */
+
+/* Continue condition */
+#elif defined(__WIN32__)
 
 void cls(void) { system("cls"); }
 
 #define ECHO "echo "
 #define ECHOSIZE 5
-
 void echo(const char *path) {
 	const char echoSymbols[ECHOSIZE] = ECHO;
 
@@ -324,27 +288,8 @@ void echo(const char *path) {
 	system(fullPath);
 }
 
-#define DIR "dir "
-#define DIRSIZE 4
-
-void dir(const char *path) {
-	const char lsSymbols[DIRSIZE] = DIR;
-
-	const unsigned char lengthString = strlen(path);
-	
-	char fullPath[DIRSIZE + lengthString + ENDSTRING];
-
-	for (unsigned char index = 0; index < DIRSIZE; fullPath[index++] = lsSymbols[index]);
-	for (unsigned char index = DIRSIZE, twindex = 0; index <= DIRSIZE+lengthString; fullPath[index++] = path[twindex++]);
-
-	fullPath[DIRSIZE + lengthString] = ENDCHAR;
-
-	system(fullPath);
-}
-
 #define COPY "copy -r "
 #define COPYSIZE 8
-
 void copy(const char *pathOne, char *pathTwo) {
 	const char cpSymbols[COPYSIZE] = COPY;
 
@@ -365,7 +310,87 @@ void copy(const char *pathOne, char *pathTwo) {
 	system(fullPath);
 }
 
-/* Operation System: Unknown */
+#define MOVE "move "
+#define MOVESIZE 5
+void move(const char *pathOne, const char *pathTwo) {
+	const char moveSymbols[MOVESIZE] = MOVE;
+
+	const unsigned char lengthString_One = strlen(pathOne);
+	const unsigned char lengthString_Two = strlen(pathTwo);
+
+	char fullPath[MOVESIZE + lengthString_One + SPACESTRING + lengthString_Two + ENDSTRING];
+
+	for (unsigned char index = 0; index < MOVESIZE; fullPath[index++] = moveSymbols[index]);
+	for (unsigned char index = MOVESIZE, twindex = 0; index <= MOVESIZE+lengthString_One; fullPath[index++] = pathOne[twindex++]);
+
+	fullPath[MOVESIZE + lengthString_One] = SPACECHAR;
+
+	for (unsigned char index = MOVESIZE+lengthString_One+1, twindex = 0; index <= MOVESIZE+lengthString_One+lengthString_Two; fullPath[index++] = pathTwo[twindex++]);
+	
+	fullPath[MOVESIZE + lengthString_One + SPACESTRING + lengthString_Two] = ENDCHAR;
+
+	system(fullPath);
+}
+
+#define REN "ren "
+#define RENSIZE 4
+void ren(const char *pathOne, const char *pathTwo) {
+	const char renSymbols[RENSIZE] = REN;
+
+	const unsigned char lengthString_One = strlen(pathOne);
+	const unsigned char lengthString_Two = strlen(pathTwo);
+
+	char fullPath[RENSIZE + lengthString_One + SPACESTRING + lengthString_Two + ENDSTRING];
+
+	for (unsigned char index = 0; index < RENSIZE; fullPath[index++] = renSymbols[index]);
+	for (unsigned char index = RENSIZE, twindex = 0; index <= RENSIZE+lengthString_One; fullPath[index++] = pathOne[twindex++]);
+
+	fullPath[RENSIZE + lengthString_One] = SPACECHAR;
+
+	for (unsigned char index = RENSIZE+lengthString_One+1, twindex = 0; index <= RENSIZE+lengthString_One+lengthString_Two; fullPath[index++] = pathTwo[twindex++]);
+	
+	fullPath[RENSIZE + lengthString_One + SPACESTRING + lengthString_Two] = ENDCHAR;
+
+	system(fullPath);
+}
+
+#define DEL "del "
+#define DELSIZE 4
+void del(const char *path) {
+	const char delSymbols[DELSIZE] = DEL;
+
+	const unsigned char lengthString = strlen(path);
+
+	char fullPath[DELSIZE + lengthString + ENDSTRING];
+
+	for (unsigned char index = 0; index < DELSIZE; fullPath[index++] = delSymbols[index]);
+	for (unsigned char index = DELSIZE, twindex = 0; index <= DELSIZE+lengthString; fullPath[index++] = path[twindex++]);
+
+	fullPath[DELSIZE + lengthString] = ENDCHAR;
+
+	system(fullPath);
+}
+
+#define RD "rd /s/q "
+#define RDSIZE 8
+void rd(const char *path) {
+	const char rdSymbols[RDSIZE] = RD;
+
+	const unsigned char lengthString = strlen(path);
+
+	char fullPath[RDSIZE + lengthString + ENDSTRING];
+
+	for (unsigned char index = 0; index < RDSIZE; fullPath[index++] = rdSymbols[index]);
+	for (unsigned char index = RDSIZE, twindex = 0; index <= RDSIZE+lengthString; fullPath[index++] = path[twindex++]);
+
+	fullPath[RDSIZE + lengthString] = ENDCHAR;
+
+	system(fullPath);
+}
+
+/* // Operation System: Unknown // */
 #else
-	#error "Error: Unknown OS."
-#endif
+#warning "Warning: Unknown OS."
+
+#endif 
+/* End condition */
