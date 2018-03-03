@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define bool _Bool
+#define true 1
+#define false 0
+
 #define ENDSTRING 1
 #define ENDCHAR '\0'
 
@@ -19,29 +23,37 @@ void pwd(void) { system("pwd"); }
 
 void uname(void) { system("uname -a"); }
 
-_Bool input(const char *file, const char *text) {
+bool create(const char *file) {
+	FILE *ptrFile;
+	if ((ptrFile = fopen(file, "w")) != NULL) {
+		fclose(ptrFile);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool input(const char *file, const char *text) {
 	FILE *ptrFile;
 	if ((ptrFile = fopen(file, "a")) != NULL) {
 		fputs(text, ptrFile);
 		fclose(ptrFile);
-		return 0;
+		return true;
 	} else {
-		printf("Error: can't append to file.\n");
-		return 1;
+		return false;
 	}
 }
 
-_Bool output(const char *file) {
+bool output(const char *file) {
 	FILE *ptrFile;
 	register char symbol;
 	if ((ptrFile = fopen(file, "r")) != NULL) {
 		while ((symbol = fgetc(ptrFile)) != EOF) 
 			printf("%c", symbol);
 		fclose(ptrFile);
-		return 0;
+		return true;
 	} else {
-		printf("Error: can't read file.\n");
-		return 1;
+		return false;
 	}
 }
 
