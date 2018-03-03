@@ -1,8 +1,8 @@
 #include <stdio.h>
 void bin(int num);
 int main(void) {
-	unsigned char number;
-	scanf("%hhu",&number);
+	char number;
+	scanf("%hhd",&number);
 	bin(number);
 	return 0;
 }
