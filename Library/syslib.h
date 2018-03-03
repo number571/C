@@ -6,11 +6,6 @@
 #define true 1
 #define false 0
 
-#define ENDSTRING 1
-#define ENDCHAR '\0'
-#define SPACESTRING 1
-#define SPACECHAR ' '
-
 bool create(const char *file) {
 	FILE *ptrFile;
 	if ((ptrFile = fopen(file, "w")) != NULL) {
@@ -44,6 +39,11 @@ bool output(const char *file) {
 		return false;
 	}
 }
+
+#define ENDSTRING 1
+#define ENDCHAR '\0'
+#define SPACESTRING 1
+#define SPACECHAR ' '
 
 /* // For Linux\Windows OS // */
 
