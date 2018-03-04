@@ -1,10 +1,12 @@
+/* // For Linux\Windows OS // */
+
+/* Start MAIN condition */
+#if defined(__linux__) || defined(__WIN32__)
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define bool _Bool
-#define true 1
-#define false 0
+enum{false, true};
 
 bool create(const char *file) {
 	FILE *ptrFile;
@@ -40,15 +42,15 @@ bool output(const char *file) {
 	}
 }
 
+#include <stdlib.h>
+#include <string.h>
+
 #define ENDSTRING 1
 #define ENDCHAR '\0'
 #define SPACESTRING 1
 #define SPACECHAR ' '
 
-/* // For Linux\Windows OS // */
-
-/* Start condition */
-#if defined(__linux__) || defined(__WIN32__)
+/* Operating System: Linux\Windows */
 
 #define RUN "./"
 #define RUNSIZE 2
@@ -119,15 +121,16 @@ void mkdir(const char *path) {
 }
 
 #endif 
-/* End condition */
+/* End MAIN condition */
 
 
 /* // Operation System: Linux // */
-
 /* Start condition */
 #if defined(__linux__)
 
 #include <unistd.h>
+
+void cd(const char *path) { chdir(path); }
 
 void clear(void) { system("clear"); }
 
@@ -247,50 +250,16 @@ void rm(const char *path) {
 	system(fullPath);
 }
 
-#define LS "ls -l "
-#define LSZISE 6
-void ls(const char *path) {
-	const char lsSymbols[LSZISE] = LS;
-
-	const unsigned char lengthString = strlen(path);
-	
-	char fullPath[LSZISE + lengthString + ENDSTRING];
-
-	for (unsigned char index = 0; index < LSZISE; fullPath[index++] = lsSymbols[index]);
-	for (unsigned char index = LSZISE, twindex = 0; index <= LSZISE+lengthString; fullPath[index++] = path[twindex++]);
-
-	fullPath[LSZISE + lengthString] = ENDCHAR;
-
-	system(fullPath);
-}
 
 /* // Operation System: Windows // */
-
 /* Continue condition */
 #elif defined(__WIN32__)
 
-void cls(void) { system("cls"); }
-
-#define ECHO "echo "
-#define ECHOSIZE 5
-void echo(const char *path) {
-	const char echoSymbols[ECHOSIZE] = ECHO;
-
-	const unsigned char lengthString = strlen(path);
-
-	char fullPath[ECHOSIZE + lengthString + ENDSTRING];
-
-	for (unsigned char index = 0; index < ECHOSIZE; fullPath[index++] = echoSymbols[index]);
-	for (unsigned char index = ECHOSIZE, twindex = 0; index <= ECHOSIZE+lengthString; fullPath[index++] = path[twindex++]);
-
-	fullPath[ECHOSIZE + lengthString] = ENDCHAR;
-
-	system(fullPath);
-}
+void clear(void) { system("cls"); }
 
 #define COPY "copy -r "
 #define COPYSIZE 8
-void copy(const char *pathOne, char *pathTwo) {
+void cp(const char *pathOne, const char *pathTwo) {
 	const char cpSymbols[COPYSIZE] = COPY;
 
 	const unsigned char lengthString_One = strlen(pathOne);
@@ -312,15 +281,15 @@ void copy(const char *pathOne, char *pathTwo) {
 
 #define MOVE "move "
 #define MOVESIZE 5
-void move(const char *pathOne, const char *pathTwo) {
-	const char moveSymbols[MOVESIZE] = MOVE;
+void mv(const char *pathOne, const char *pathTwo) {
+	const char mvSymbols[MOVESIZE] = MOVE;
 
 	const unsigned char lengthString_One = strlen(pathOne);
 	const unsigned char lengthString_Two = strlen(pathTwo);
 
 	char fullPath[MOVESIZE + lengthString_One + SPACESTRING + lengthString_Two + ENDSTRING];
 
-	for (unsigned char index = 0; index < MOVESIZE; fullPath[index++] = moveSymbols[index]);
+	for (unsigned char index = 0; index < MOVESIZE; fullPath[index++] = mvSymbols[index]);
 	for (unsigned char index = MOVESIZE, twindex = 0; index <= MOVESIZE+lengthString_One; fullPath[index++] = pathOne[twindex++]);
 
 	fullPath[MOVESIZE + lengthString_One] = SPACECHAR;
@@ -328,45 +297,6 @@ void move(const char *pathOne, const char *pathTwo) {
 	for (unsigned char index = MOVESIZE+lengthString_One+1, twindex = 0; index <= MOVESIZE+lengthString_One+lengthString_Two; fullPath[index++] = pathTwo[twindex++]);
 	
 	fullPath[MOVESIZE + lengthString_One + SPACESTRING + lengthString_Two] = ENDCHAR;
-
-	system(fullPath);
-}
-
-#define REN "ren "
-#define RENSIZE 4
-void ren(const char *pathOne, const char *pathTwo) {
-	const char renSymbols[RENSIZE] = REN;
-
-	const unsigned char lengthString_One = strlen(pathOne);
-	const unsigned char lengthString_Two = strlen(pathTwo);
-
-	char fullPath[RENSIZE + lengthString_One + SPACESTRING + lengthString_Two + ENDSTRING];
-
-	for (unsigned char index = 0; index < RENSIZE; fullPath[index++] = renSymbols[index]);
-	for (unsigned char index = RENSIZE, twindex = 0; index <= RENSIZE+lengthString_One; fullPath[index++] = pathOne[twindex++]);
-
-	fullPath[RENSIZE + lengthString_One] = SPACECHAR;
-
-	for (unsigned char index = RENSIZE+lengthString_One+1, twindex = 0; index <= RENSIZE+lengthString_One+lengthString_Two; fullPath[index++] = pathTwo[twindex++]);
-	
-	fullPath[RENSIZE + lengthString_One + SPACESTRING + lengthString_Two] = ENDCHAR;
-
-	system(fullPath);
-}
-
-#define DEL "del "
-#define DELSIZE 4
-void del(const char *path) {
-	const char delSymbols[DELSIZE] = DEL;
-
-	const unsigned char lengthString = strlen(path);
-
-	char fullPath[DELSIZE + lengthString + ENDSTRING];
-
-	for (unsigned char index = 0; index < DELSIZE; fullPath[index++] = delSymbols[index]);
-	for (unsigned char index = DELSIZE, twindex = 0; index <= DELSIZE+lengthString; fullPath[index++] = path[twindex++]);
-
-	fullPath[DELSIZE + lengthString] = ENDCHAR;
 
 	system(fullPath);
 }
@@ -392,5 +322,5 @@ void rd(const char *path) {
 #else
 #warning "Warning: Unknown OS."
 
-#endif 
 /* End condition */
+#endif 
