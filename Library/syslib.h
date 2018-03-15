@@ -1,6 +1,7 @@
 /* // For Linux\Windows OS // */
 
 /* Start MAIN condition */
+/* Operating System: Linux\Windows */
 #if defined(__linux__) || defined(__WIN32__)
 
 #include <stdio.h>
@@ -42,6 +43,16 @@ bool output(const char *file) {
 	}
 }
 
+char *pwd(char *buffer) {
+	FILE *result = popen("pwd", "r");
+    if (result != NULL)
+    	while(fgets(buffer, 128, result) != NULL);
+    else return false;
+    return buffer;
+    pclose(result);
+}
+
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -50,12 +61,9 @@ bool output(const char *file) {
 #define SPACESTRING 1
 #define SPACECHAR ' '
 
-/* Operating System: Linux\Windows */
-
-#define RUN "./"
 #define RUNSIZE 2
 void run(const char *path) {
-	const char runSymbols[RUNSIZE] = RUN;
+	const char runSymbols[RUNSIZE] = "./";
 
 	const unsigned char lengthString = strlen(path);
 
@@ -69,10 +77,9 @@ void run(const char *path) {
 	system(fullPath);
 }
 
-#define ECHO "echo "
 #define ECHOSIZE 5
 void echo(const char *path) {
-	const char echoSymbols[ECHOSIZE] = ECHO;
+	const char echoSymbols[ECHOSIZE] = "echo ";
 
 	const unsigned char lengthString = strlen(path);
 
@@ -86,10 +93,9 @@ void echo(const char *path) {
 	system(fullPath);
 }
 
-#define DIR "dir "
 #define DIRSIZE 4
 void dir(const char *path) {
-	const char lsSymbols[DIRSIZE] = DIR;
+	const char lsSymbols[DIRSIZE] = "dir ";
 
 	const unsigned char lengthString = strlen(path);
 	
@@ -103,10 +109,9 @@ void dir(const char *path) {
 	system(fullPath);
 }
 
-#define MKDIR "mkdir "
 #define MKDIRSIZE 6
 void mkdir(const char *path) {
-	const char mkdirSymbols[MKDIRSIZE] = MKDIR;
+	const char mkdirSymbols[MKDIRSIZE] = "mkdir ";
 
 	const unsigned char lengthString = strlen(path);
 
@@ -128,20 +133,11 @@ void mkdir(const char *path) {
 /* Start condition */
 #if defined(__linux__)
 
-#include <unistd.h>
-
-void cd(const char *path) { chdir(path); }
-
-void clear(void) { system("clear"); }
-
-void pwd(void) { system("pwd"); }
-
 void uname(void) { system("uname -a"); }
 
-#define TOUCH "touch "
 #define TOUCHSIZE 6
 void touch(const char *path) {
-	const char touchSymbols[TOUCHSIZE] = TOUCH;
+	const char touchSymbols[TOUCHSIZE] = "touch ";
 
 	const unsigned char lengthString = strlen(path);
 
@@ -155,10 +151,9 @@ void touch(const char *path) {
 	system(fullPath);
 }
 
-#define CAT "cat "
 #define CATSIZE 4
 void cat(const char *path) {
-	const char catSymbols[CATSIZE] = CAT;
+	const char catSymbols[CATSIZE] = "cat ";
 
 	const unsigned char lengthString = strlen(path);
 
@@ -172,10 +167,9 @@ void cat(const char *path) {
 	system(fullPath);
 }
 
-#define FILE "file "
 #define FILESIZE 5
 void file(const char *path) {
-	const char fileSymbols[FILESIZE] = FILE;
+	const char fileSymbols[FILESIZE] = "file ";
 
 	const unsigned char lengthString = strlen(path);
 
@@ -189,10 +183,9 @@ void file(const char *path) {
 	system(fullPath);
 }
 
-#define MV "mv "
 #define MVSIZE 3
 void mv(const char *pathOne, const char *pathTwo) {
-	const char mvSymbols[MVSIZE] = MV;
+	const char mvSymbols[MVSIZE] = "mv ";
 
 	const unsigned char lengthString_One = strlen(pathOne);
 	const unsigned char lengthString_Two = strlen(pathTwo);
@@ -211,10 +204,9 @@ void mv(const char *pathOne, const char *pathTwo) {
 	system(fullPath);
 }
 
-#define CP "cp "
-#define CPSIZE 3
+#define CPSIZE 6
 void cp(const char *pathOne, const char *pathTwo) {
-	const char cpSymbols[CPSIZE] = CP;
+	const char cpSymbols[CPSIZE] = "cp -r ";
 
 	const unsigned char lengthString_One = strlen(pathOne);
 	const unsigned char lengthString_Two = strlen(pathTwo);
@@ -233,10 +225,9 @@ void cp(const char *pathOne, const char *pathTwo) {
 	system(fullPath);
 }
 
-#define RM "rm -rf "
 #define RMSIZE 7
 void rm(const char *path) {
-	const char rmSymbols[RMSIZE] = RM;
+	const char rmSymbols[RMSIZE] = "rm -rf ";
 
 	const unsigned char lengthString = strlen(path);
 
@@ -257,10 +248,9 @@ void rm(const char *path) {
 
 void clear(void) { system("cls"); }
 
-#define COPY "copy -r "
 #define COPYSIZE 8
 void cp(const char *pathOne, const char *pathTwo) {
-	const char cpSymbols[COPYSIZE] = COPY;
+	const char cpSymbols[COPYSIZE] = "copy -r ";
 
 	const unsigned char lengthString_One = strlen(pathOne);
 	const unsigned char lengthString_Two = strlen(pathTwo);
@@ -279,10 +269,9 @@ void cp(const char *pathOne, const char *pathTwo) {
 	system(fullPath);
 }
 
-#define MOVE "move "
 #define MOVESIZE 5
 void mv(const char *pathOne, const char *pathTwo) {
-	const char mvSymbols[MOVESIZE] = MOVE;
+	const char mvSymbols[MOVESIZE] = "move ";
 
 	const unsigned char lengthString_One = strlen(pathOne);
 	const unsigned char lengthString_Two = strlen(pathTwo);
@@ -301,10 +290,9 @@ void mv(const char *pathOne, const char *pathTwo) {
 	system(fullPath);
 }
 
-#define RD "rd /s/q "
 #define RDSIZE 8
 void rd(const char *path) {
-	const char rdSymbols[RDSIZE] = RD;
+	const char rdSymbols[RDSIZE] = "rd /s/q ";
 
 	const unsigned char lengthString = strlen(path);
 
