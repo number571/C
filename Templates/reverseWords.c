@@ -34,7 +34,7 @@ void reverseWords(const char *message, char buffer[]) {
 		buffer[local++] = message[index];
 	}
 
-	buffer[length+2] = '\0';
+	buffer[length+1] = '\0';
 
 	return;
 }
