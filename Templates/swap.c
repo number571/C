@@ -1,5 +1,5 @@
 #include <stdio.h>
-int moveTo(int *x, int *y);
+void moveTo(int *x, int *y);
 
 int main(void) {
 	int x, y;
@@ -8,7 +8,7 @@ int main(void) {
 	printf("%d %d\n", x,y);
 }
 
-int moveTo(int *x, int *y) {
+void moveTo(int *x, int *y) {
 	*x = *x ^ *y;
 	*y = *x ^ *y;
 	*x = *x ^ *y;
