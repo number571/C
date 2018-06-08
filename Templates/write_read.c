@@ -1,73 +1,77 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define DEBUG_TURN
+
+#define DEBUG_SUCCESS(x) printf("[+] SUCCESS: ["x"]\n")
+#define DEBUG_FAILURE(x) printf("[x] FAILURE: ["x"]\n")
+
+#define DEBUG_CREATE DEBUG_FAILURE("CREATE"):DEBUG_SUCCESS("CREATE")
+#define DEBUG_INPUT DEBUG_FAILURE("INPUT"):DEBUG_SUCCESS("INPUT")
+#define DEBUG_OUTPUT DEBUG_SUCCESS("OUTPUT"):DEBUG_FAILURE("OUTPUT")
 
 typedef unsigned int uint32_t;
 
-_Bool create(const char *filename);
-_Bool input(const char *filename, const char *text);
-char* output(const char *filename);
+_Bool create(char *filename);
+_Bool input(char *filename, char *text);
+char* output(char *filename);
 
 int main(void) {
+	char *filename = "file.txt";
+	char *message = "Hello World!";
+	#ifdef DEBUG_TURN
+		create(filename) ? DEBUG_CREATE;
+		input(filename, message) ? DEBUG_INPUT;
 
-	const char *name = "file.txt";
-	const char *message = "Hello World!";
+		char *result = output(filename);
+		result ? DEBUG_OUTPUT;
+		printf("%s\n", result);
+	#else
+		create(filename);
+		input(filename, message);
 
-	printf("File: '%s'\n", name);
-	printf("Text: '%s'\n", message);
+		char *result = output(filename);
+		printf("%s\n", result);
+	#endif
 
-	if (create(name) == 0)
-		printf("[+] File created\n");
-	else
-		printf("[-] File not created\n");
-
-	if (input(name, message) == 0)
-		printf("[+] File << Text\n");
-	else
-		printf("[-] File x< Text\n");
-
-	char *text = output(name);
-	if (text != NULL)
-		printf("[+] File >> '%s'\n", text);
-	else
-		printf("[-] File >x\n");
-
-	free(text);
-	return 0;
+	return EXIT_SUCCESS;
 }
 
-_Bool create(const char *filename) {
+_Bool create(char *filename) {
 	FILE *file = fopen(filename, "w");
-	if (file != NULL) 
+	if (file != NULL) {
 		fclose(file);
-	else return 1;
-	return 0;
+		return EXIT_SUCCESS;
+	} else return EXIT_FAILURE;
 }
 
-_Bool input(const char *filename, const char *text) {
+_Bool input(char *filename, char *text) {
 	FILE *file = fopen(filename, "a");
 	if (file != NULL) {
+
 		uint32_t length = strlen(text);
 		for (uint32_t index = 0; index < length; index++)
-			putc(*(text + index), file);
+			putc(*(text+index), file);
+
 		fclose(file);
-	} else return 1;
-	return 0;
+		return EXIT_SUCCESS;
+	} else return EXIT_FAILURE;
 }
 
-char* output(const char *filename) {
+char* output(char *filename) {
 	FILE *file = fopen(filename, "r");
 	if (file != NULL) {
-		
 		fseek(file, 0, SEEK_END);
-		uint32_t size = ftell(file);
+		uint32_t length = ftell(file);
 		fseek(file, 0, SEEK_SET);
 
-		char *content = (char*) malloc(size * sizeof(char));
+		uint32_t index = 0; char c;
+		char *content = (char*) malloc(length * sizeof(char));
 
-		uint32_t index; char c;
-		while ((c = getc(file)) != EOF)
+		while((c = getc(file)) != EOF)
 			*(content + index++) = c;
+		*(content + index) = '\0';
 
 		fclose(file);
 		return content;
