@@ -21,7 +21,6 @@ int main(void) {
         text[index] = toupper(text[index]);
 
     encryptDecrypt(mode, text, key);
-
     printf("Final message: %s\n", text);
     return 0;
 }
