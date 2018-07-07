@@ -1,10 +1,12 @@
+#!/usr/bin/tcc -run
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
 #define BUFFER 128
 
-char *encryptDecrypt(char mode, char *message, short key);
+void encryptDecrypt(char mode, char *message, short key);
 
 int main(void) {
     char mode; short key;
@@ -25,7 +27,7 @@ int main(void) {
     return 0;
 }
 
-char *encryptDecrypt(char mode, char *message, short key) {
+void encryptDecrypt(char mode, char *message, short key) {
     if (mode == 'E')
         for (unsigned short index = 0; index < strlen(message); index++)
             message[index] = (message[index] + key - 13) % 26 + 'A';
