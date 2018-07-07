@@ -1,5 +1,3 @@
-#!/usr/bin/tcc -run
-
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
