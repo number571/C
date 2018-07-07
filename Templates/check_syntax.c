@@ -1,6 +1,3 @@
-#!/usr/bin/tcc -run
-/* COMPILER: TCC */
-
 #include <stdio.h>
 
 #define OPEN 1
