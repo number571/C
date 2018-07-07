@@ -13,7 +13,7 @@ union code {
         unsigned _5: 1;
         unsigned _6: 1;
         unsigned _7: 1;
-    } byte;
+    } bit;
 };
 
 int main(void) {
@@ -21,8 +21,8 @@ int main(void) {
     check.number = 22;
 
     printf("%d %d %d %d %d %d %d %d\n", 
-        check.byte._7, check.byte._6, check.byte._5, check.byte._4,
-        check.byte._3, check.byte._2, check.byte._1, check.byte._0);
+        check.bit._7, check.bit._6, check.bit._5, check.bit._4,
+        check.bit._3, check.bit._2, check.bit._1, check.bit._0);
 
     return 0;
 }
