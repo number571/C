@@ -15,6 +15,8 @@ _Bool copyFile(const char* const readfile, const char* const copyfile) {
     if ((read != NULL) && (copy != NULL)) {
         while(fgets(localBuffer, BUFF, read) != NULL)
             fputs(localBuffer, copy);
+        fclose(read);
+        fclose(copy);
     } else return 1;
     return 0;
 }
