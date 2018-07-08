@@ -8,8 +8,7 @@
 
 #elif defined(linux)
     #define LINUX
-    char getch();
-
+    char getch(void);
 #else
     #error "Platform is not supported"
 #endif
@@ -66,7 +65,7 @@ int main (void) {
 #endif
 
 #ifdef LINUX
-    char getch() {
+    char getch(void) {
         char ch;
         system("stty raw"); 
         ch = getchar();
