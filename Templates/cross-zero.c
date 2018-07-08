@@ -12,7 +12,6 @@
     #error "Platform is not supported"
 #endif
 
-
 enum {Y = 7, X = 13};
 typedef enum {false, true} bool;
 
