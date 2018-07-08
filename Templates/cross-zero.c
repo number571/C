@@ -1,5 +1,3 @@
-/* #!/usr/bin/tcc -run */
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -8,7 +6,7 @@
     #include <conio.h>
 
 #elif defined(unix)
-    #define LINUX
+    #define UNIX
     char getch(void);
 #else
     #error "Platform is not supported"
@@ -66,7 +64,7 @@ void clear (void) {
     #endif
 }
 
-#ifdef LINUX
+#ifdef UNIX
     char getch (void) {
         char ch;
         system("stty raw"); 
