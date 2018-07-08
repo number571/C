@@ -1,3 +1,5 @@
+/* #!/usr/bin/tcc -run */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -65,6 +67,16 @@ int main (void) {
     }
 #endif
 
+#ifdef LINUX
+    char getch() {
+        char ch;
+        system("stty raw"); 
+        ch = getchar();
+        system("stty cooked");
+        return ch;
+    }
+#endif
+
 void menu (void) {
     char symbol;
     start:
@@ -78,13 +90,7 @@ void menu (void) {
         printf("\t> ");
 
     restart:
-        #ifdef WINDOWS
-            symbol = getch();
-        #else 
-            system("stty raw"); 
-            symbol = getchar();
-            system("stty cooked");
-        #endif
+        symbol = getch();
 
     switch(symbol) {
         case '1': game(); break;
@@ -114,14 +120,8 @@ void game (void) {
         again:
             printMap();
             printf("\v\t Number > ");
-
-            #ifdef WINDOWS
-                symbol = getch();
-            #else
-                system("stty raw"); 
-                symbol = getchar();
-                system("stty cooked");
-            #endif
+            
+            symbol = getch();
 
         switch(symbol) {
             case '0': printf("\n\n"); return;
