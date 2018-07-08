@@ -1,6 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(_WIN32) || defined (_WIN64) 
+    #define WINDOWS
+#else
+    #define LINUX
+#endif
+
+#ifdef WINDOWS
+    #include <conio.h>
+    void clrscr(void); 
+#endif
+
 #define Y 7
 #define X 13
 
@@ -45,17 +56,33 @@ int main (void) {
     return 0;
 }
 
+#ifdef WINDOWS
+    void clrscr(void) {
+        printf("\033[2J");
+        printf("\033[0;0f");
+    }
+#endif
+
 void menu (void) {
+    char symbol;
     start:
-        system("clear");
+        #ifdef WINDOWS
+            clrscr();
+        #else 
+            system("clear");
+        #endif
         printf("\v\tPRESS '1' TO START GAME\n");
         printf("\tPRESS '0' TO STOP GAME\n");
         printf("\t> ");
 
     restart:
-        system("stty raw"); 
-            char symbol = getchar();
-        system("stty cooked"); 
+        #ifdef WINDOWS
+            symbol = getch();
+        #else 
+            system("stty raw"); 
+            symbol = getchar();
+            system("stty cooked");
+        #endif
 
     switch(symbol) {
         case '1': game(); break;
@@ -85,9 +112,13 @@ void game (void) {
             printMap();
             printf("\v\t Number > ");
 
-            system("stty raw"); 
+            #ifdef WINDOWS
+                symbol = getch();
+            #else
+                system("stty raw"); 
                 symbol = getchar();
-            system("stty cooked"); 
+                system("stty cooked");
+            #endif
 
         switch(symbol) {
             case '0': printf("\n\n"); return;
@@ -111,8 +142,14 @@ void game (void) {
 
 void printMap (void) {
     unsigned char x, y;
-    system("clear");
-    printf("\v");
+
+    #ifdef WINDOWS
+        clrscr();
+    #else
+        system("clear");
+    #endif
+
+    printf("\n\v");
     for (y = 0; y < 7; y++) {
         printf("\t");
         for (x = 0; x < 13; x++)
