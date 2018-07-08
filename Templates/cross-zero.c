@@ -3,15 +3,14 @@
 
 #if defined(_WIN32) || defined(_WIN64) 
     #define WINDOWS
+    #include <conio.h>
+    void clrscr(void);
+
 #elif defined(linux)
     #define LINUX
+    char getch();
 #else
     #error "Platform is not supported"
-#endif
-
-#ifdef WINDOWS
-    #include <conio.h>
-    void clrscr(void); 
 #endif
 
 #define Y 7
@@ -118,7 +117,7 @@ void game (void) {
         again:
             printMap();
             printf("\v\t Number > ");
-            
+
             symbol = getch();
 
         switch(symbol) {
