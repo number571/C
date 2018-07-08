@@ -1,10 +1,14 @@
+/* #!/usr/bin/tcc -run */
+
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined(_WIN32) || defined (_WIN64) 
+#if defined(_WIN32) || defined(_WIN64) 
     #define WINDOWS
-#else
+#elif defined(linux)
     #define LINUX
+#else
+    #error "Platform is not supported"
 #endif
 
 #ifdef WINDOWS
@@ -100,6 +104,7 @@ void menu (void) {
 }
 
 void restart (void) {
+    now = CROSS;
     NUM7 = '7'; NUM8 = '8'; NUM9 = '9';
     NUM4 = '4'; NUM5 = '5'; NUM6 = '6';
     NUM1 = '1'; NUM2 = '2'; NUM3 = '3';
