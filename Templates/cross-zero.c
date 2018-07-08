@@ -4,7 +4,6 @@
 #if defined(_WIN32) || defined(_WIN64) 
     #define WINDOWS
     #include <conio.h>
-    void clrscr(void);
 
 #elif defined(linux)
     #define LINUX
@@ -57,15 +56,17 @@ int main (void) {
     return 0;
 }
 
-#ifdef WINDOWS
-    void clrscr(void) {
+void clear (void) {
+    #ifdef WINDOWS
         printf("\033[2J");
         printf("\033[0;0f");
-    }
-#endif
+    #else
+        system("clear");
+    #endif
+}
 
 #ifdef LINUX
-    char getch(void) {
+    char getch (void) {
         char ch;
         system("stty raw"); 
         ch = getchar();
@@ -77,11 +78,8 @@ int main (void) {
 void menu (void) {
     char symbol;
     start:
-        #ifdef WINDOWS
-            clrscr();
-        #else 
-            system("clear");
-        #endif
+        clear();
+
         printf("\v\tPRESS '1' TO START GAME\n");
         printf("\tPRESS '0' TO STOP GAME\n");
         printf("\t> ");
@@ -142,14 +140,9 @@ void game (void) {
 
 void printMap (void) {
     unsigned char x, y;
+    
+    clear(); printf("\n\v");
 
-    #ifdef WINDOWS
-        clrscr();
-    #else
-        system("clear");
-    #endif
-
-    printf("\n\v");
     for (y = 0; y < 7; y++) {
         printf("\t");
         for (x = 0; x < 13; x++)
