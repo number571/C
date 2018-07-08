@@ -110,7 +110,7 @@ void restart (void) {
 
 void game (void) {
     char symbol;
-    while(1) {
+    while(true) {
         again:
             printMap();
             printf("\v\t Number > ");
