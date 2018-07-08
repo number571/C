@@ -5,7 +5,6 @@
     #define WINDOWS
     #include <conio.h>
     void clrscr(void);
-
 #elif defined(linux)
     #define LINUX
     char getch();
