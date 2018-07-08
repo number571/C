@@ -158,7 +158,7 @@ bool checkWin (void) {
     if ((NUM7 == ZERO && NUM8 == ZERO && NUM9 == ZERO)||
         (NUM7 == CROSS && NUM8 == CROSS && NUM9 == CROSS)
     ) {
-        temp = NUM7; NUM7 = NUM8 = NUM9 = '+'; printMap();
+        temp = NUM7; NUM7 = NUM8 = NUM9 = '-'; printMap();
         printf("\n\t WIN: %s\n\n",(temp == ZERO)?"  ZERO":" CROSS");
         win = true;
     }
@@ -166,7 +166,7 @@ bool checkWin (void) {
     if ((NUM4 == ZERO && NUM5 == ZERO && NUM6 == ZERO)||
         (NUM4 == CROSS && NUM5 == CROSS && NUM6 == CROSS)
     ) {
-        temp = NUM4; NUM4 = NUM5 = NUM6 = '+'; printMap();
+        temp = NUM4; NUM4 = NUM5 = NUM6 = '-'; printMap();
         printf("\n\t WIN: %s\n\n",(temp == ZERO)?"  ZERO":" CROSS");
         win = true;
     }
@@ -174,7 +174,7 @@ bool checkWin (void) {
     if ((NUM1 == ZERO && NUM2 == ZERO && NUM3 == ZERO)||
         (NUM1 == CROSS && NUM2 == CROSS && NUM3 == CROSS)
     ) {
-        temp = NUM1; NUM1 = NUM2 = NUM3 = '+'; printMap();
+        temp = NUM1; NUM1 = NUM2 = NUM3 = '-'; printMap();
         printf("\n\t WIN: %s\n\n",(temp == ZERO)?"  ZERO":" CROSS");
         win = true;
     }
@@ -184,7 +184,7 @@ bool checkWin (void) {
     if ((NUM7 == ZERO && NUM4 == ZERO && NUM1 == ZERO)||
         (NUM7 == CROSS && NUM4 == CROSS && NUM1 == CROSS)
     ) {
-        temp = NUM7; NUM7 = NUM4 = NUM1 = '+'; printMap();
+        temp = NUM7; NUM7 = NUM4 = NUM1 = '|'; printMap();
         printf("\n\t WIN: %s\n\n",(temp == ZERO)?"  ZERO":" CROSS");
         win = true;
     }
@@ -192,7 +192,7 @@ bool checkWin (void) {
     if ((NUM8 == ZERO && NUM5 == ZERO && NUM2 == ZERO)||
         (NUM8 == CROSS && NUM5 == CROSS && NUM2 == CROSS)
     ) {
-        temp = NUM8; NUM8 = NUM5 = NUM2 = '+'; printMap();
+        temp = NUM8; NUM8 = NUM5 = NUM2 = '|'; printMap();
         printf("\n\t WIN: %s\n\n",(temp == ZERO)?"  ZERO":" CROSS");
         win = true;
     }
@@ -200,7 +200,7 @@ bool checkWin (void) {
     if ((NUM9 == ZERO && NUM6 == ZERO && NUM3 == ZERO)||
         (NUM9 == CROSS && NUM6 == CROSS && NUM3 == CROSS)
     ) {
-        temp = NUM9; NUM9 = NUM6 = NUM3 = '+'; printMap();
+        temp = NUM9; NUM9 = NUM6 = NUM3 = '|'; printMap();
         printf("\n\t WIN: %s\n\n",(temp == ZERO)?"  ZERO":" CROSS");
         win = true;
     }
@@ -210,7 +210,7 @@ bool checkWin (void) {
     if ((NUM7 == ZERO && NUM5 == ZERO && NUM3 == ZERO)||
         (NUM7 == CROSS && NUM5 == CROSS && NUM3 == CROSS)
     ) {
-        temp = NUM7; NUM7 = NUM5 = NUM3 = '+'; printMap();
+        temp = NUM7; NUM7 = NUM5 = NUM3 = '\\'; printMap();
         printf("\n\t  WIN: %s\n\n",(temp == ZERO)?"  ZERO":" CROSS");
         win = true;
     }
@@ -218,7 +218,7 @@ bool checkWin (void) {
     if ((NUM9 == ZERO && NUM5 == ZERO && NUM1 == ZERO)||
         (NUM9 == CROSS && NUM5 == CROSS && NUM1 == CROSS)
     ) {
-        temp = NUM9; NUM9 = NUM5 = NUM1 = '+'; printMap();
+        temp = NUM9; NUM9 = NUM5 = NUM1 = '/'; printMap();
         printf("\n\t WIN: %s\n\n",(temp == ZERO)?"  ZERO":" CROSS");
         win = true;
     }
