@@ -12,9 +12,7 @@
     #error "Platform is not supported"
 #endif
 
-#define Y 7
-#define X 13
-
+enum {Y = 7, X = 13};
 typedef enum {false, true} bool;
 
 enum State { ZERO = 'O', CROSS = 'X' };
