@@ -1,3 +1,5 @@
+/* #!/usr/bin/tcc -run */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -5,12 +7,13 @@
     #define WINDOWS
     #include <conio.h>
 
-#elif defined(linux)
+#elif defined(unix)
     #define LINUX
     char getch(void);
 #else
     #error "Platform is not supported"
 #endif
+
 
 enum {Y = 7, X = 13};
 typedef enum {false, true} bool;
