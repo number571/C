@@ -38,7 +38,7 @@ char map[Y][X] = {
 #define NUM8 map[1][6]
 #define NUM9 map[1][10]
 
-#define CHANGE(x) (x == ZERO || x == CROSS)?(x):(x = now)
+#define CHANGE(x) (x = now)
 #define GOTO(x) if(x == ZERO || x == CROSS) goto again; else CHANGE(x);
 
 void menu (void);
@@ -66,7 +66,7 @@ void clear (void) {
 #ifdef UNIX
     char getch (void) {
         char ch;
-        system("stty raw"); 
+        system("stty raw");
         ch = getchar();
         system("stty cooked");
         return ch;
@@ -127,6 +127,7 @@ void game (void) {
             case '7': GOTO(NUM7);   break;
             case '8': GOTO(NUM8);   break;
             case '9': GOTO(NUM9);   break;
+            default: goto again;
         }
 
         if (checkWin()) return;
