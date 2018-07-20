@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define bool _Bool
-enum {false, true};
+typedef enum {false, true} bool;
 
 int main(void) {
 	bool value = true;
