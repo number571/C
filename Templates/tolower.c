@@ -13,3 +13,9 @@ int tolower_ (char c) {
         return c + 'a' - 'A';
     else return c;
 }
+
+/*
+int tolower_ (char c) {
+    return c >= 'A' && c <= 'Z' ? c + 'a' - 'A' : c;
+}
+*/
