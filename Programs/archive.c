@@ -2,9 +2,9 @@
 #define UINT64 unsigned long long int
 
 /* [Archive]:
- *      ./main archive.zip file1.exp file2.exp file3.exp ...
+ *      ./main archive file1 file2 file3 ...
  * [Unarchive]:
- *      ./main archive.zip
+ *      ./main archive
  */
 
 void get_length (UINT64 array[], const int argc, const char const *argv[]);
