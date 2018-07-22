@@ -7,14 +7,14 @@
  *      ./main archive
  */
 
-void get_length (UINT64 array[], const int argc, const char const *argv[]);
+void get_length (UINT64 array[], const int argc, char const *argv[]);
 void input_length (FILE* const arch, UINT64 array[], const int argc, char const *argv[]);
-void input_files (FILE* const arch, const int argc, const char const *argv[]);
+void input_files (FILE* const arch, const int argc, char const *argv[]);
 
-void archive (FILE* const arch, const int argc, const char const *argv[]);
+void archive (FILE* const arch, const int argc, char const *argv[]);
 void unarchive (FILE* const arch);
 
-int main (const int argc, const char const *argv[]) {
+int main (const int argc, char const *argv[]) {
     if (argc < 2) {
         printf("Error: archive not found.\n");
         return 1;
@@ -69,14 +69,14 @@ void unarchive (FILE* const arch) {
     }
 }
 
-void archive (FILE* const arch, const int argc, const char const *argv[]) {
+void archive (FILE* const arch, const int argc, char const *argv[]) {
     auto UINT64 save_length[argc-2];
     get_length(save_length, argc, argv);
     input_length(arch, save_length, argc, argv);
     input_files(arch, argc, argv);
 }
 
-void get_length (UINT64 array[], const int argc, const char const *argv[]) {
+void get_length (UINT64 array[], const int argc, char const *argv[]) {
     auto FILE *file;
     auto unsigned char index;
     for (index = 2; index < argc; index++) {
@@ -98,7 +98,7 @@ void input_length (FILE* const arch, UINT64 array[], const int argc, char const 
     fprintf(arch, "\n");
 }
 
-void input_files (FILE* const arch, const int argc, const char const *argv[]) {
+void input_files (FILE* const arch, const int argc, char const *argv[]) {
     auto FILE *file;
     auto int c;
     auto unsigned char index;
