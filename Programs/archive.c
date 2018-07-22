@@ -94,7 +94,7 @@ void get_length (UINT64 array[], const int argc, const char const *argv[]) {
 void input_length (FILE* const arch, UINT64 array[], const int argc, char const *argv[]) {
     auto unsigned char index;
     for (index = 0; index < argc-2; index++)
-        fprintf(arch, "| %d = %s |", array[index], argv[index+2]);
+        fprintf(arch, "| %llu = %s |", array[index], argv[index+2]);
     fprintf(arch, "\n");
 }
 
