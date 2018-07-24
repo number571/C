@@ -115,9 +115,6 @@ bool reversed = false;
 bool exit_mode = false;
 bool win = false;
 
-enum State {player, bot};
-enum State turn = player;
-
 unsigned char X = DEFAULT_X;
 unsigned char Y = DEFAULT_Y;
 
