@@ -529,21 +529,26 @@ void generate_opp_map (void) {
     if (vertical) {
         if (y + size_ship > 10)
             goto again;
+
         for (counter = 0; counter < size_ship; counter++)
             if (map_opp[y+counter][x] == SET_BLOCK)
                 goto again;
+
         for (counter = 0; counter < size_ship; counter++)
             map_opp[y+counter][x] = SET_BLOCK;
 
     } else {
         if (x + size_ship > 49)
             goto again;
+
         for (counter = 0; counter < size_ship; counter++)
             if (map_opp[y][x+counter*2] == SET_BLOCK)
                 goto again;
+
         for (counter = 0; counter < size_ship; counter++)
             map_opp[y][x+counter*2] = SET_BLOCK;
     }
+
     if (count_ship != 1) {
         --count_ship;
         switch(count_ship) {
@@ -568,8 +573,10 @@ bool boom_opp (void) {
         goto again;
 
     if (map[y][x] == SET_BLOCK) {
+
         map[y][x] = HIT;
         ++count_damaged_ship;
+
         if (count_damaged_ship == 20) {
             print_map();
             return true;
@@ -596,8 +603,10 @@ char boom (void) {
         if (boom_opp()) return -1;
 
     } else if (map_opp[Y_opp][X_opp] == SPACE){
+
         map[Y_opp][X_opp] = MISS;
         map_opp[Y_opp][X_opp] = MISS;
+
         if (boom_opp()) return -1;
     }
     return 0;
