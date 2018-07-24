@@ -113,7 +113,7 @@ typedef enum {false, true} bool;
 bool menu_mode = true;
 bool reversed = false;
 bool exit_mode = false;
-bool win = false;
+char win = 0;
 
 unsigned char X = DEFAULT_X;
 unsigned char Y = DEFAULT_Y;
@@ -175,11 +175,15 @@ int main (void) {
     get_menu();
     if (menu_mode) {
         move_ships();
+
         if (!exit_mode) {
             start_game();
-            if (win) print_result("WIN ");
+
+            if (win == 1) print_result("WIN ");
+            else if (win == -1) print_result("EXIT");
             else print_result("LOSE");
-        }
+
+        } else print_result("EXIT");
     } else clear();
 
     return 0;
@@ -500,11 +504,11 @@ void start_game (void) {
 
             case 13 : 
                 result = boom();
-                if (result == 1) { win = true; return; } 
+                if (result == 1) { win = 1; return; } 
                 else if (result == -1) { return; } 
                 else break;
 
-            case 27: return;
+            case 27: { win = -1; return; }
             default: break;
         }
     }
