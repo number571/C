@@ -504,6 +504,7 @@ void start_game (void) {
 
             case 13 : 
                 result = boom();
+                
                 if (result == 1) { win = 1; return; } 
                 else if (result == -1) { return; } 
                 else break;
