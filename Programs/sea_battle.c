@@ -110,60 +110,61 @@ char menu[MENU_Y][MENU_X] = {
 
 typedef enum {false, true} bool;
 
-bool menu_mode = true;
-bool reversed = false;
-bool exit_mode = false;
-char win = 0;
+static bool menu_mode = true;
+static bool reversed = false;
+static bool exit_mode = false;
 
-unsigned char X = DEFAULT_X;
-unsigned char Y = DEFAULT_Y;
+static char win;
 
-unsigned char X_opp = DEFAULT_X_OPP;
-unsigned char Y_opp = DEFAULT_Y_OPP;
+static unsigned char X = DEFAULT_X;
+static unsigned char Y = DEFAULT_Y;
 
-unsigned char opp_move_X = DEFAULT_X_OPP;
-unsigned char opp_move_Y = DEFAULT_Y_OPP;
+static unsigned char X_opp = DEFAULT_X_OPP;
+static unsigned char Y_opp = DEFAULT_Y_OPP;
 
-unsigned char size_ship = 4;
-unsigned char count_ship = 10;
+static unsigned char opp_move_X = DEFAULT_X_OPP;
+static unsigned char opp_move_Y = DEFAULT_Y_OPP;
 
-unsigned char count_damaged_ship = 0;
-unsigned char count_damaged_opp_ship = 0;
+static unsigned char size_ship = 4;
+static unsigned char count_ship = 10;
+
+static unsigned char count_damaged_ship = 0;
+static unsigned char count_damaged_opp_ship = 0;
 
 /**********************************************/
 /*                 FUNC BLOCK                 */
 /**********************************************/
 
 /* MAIN BLOCK */
-void print_map (void);
-void print_result (char *s);
+static void print_map (void);
+static void print_result (const char* const s);
 
 /* MENU BLOCK */
-void get_menu (void);
-void print_menu (void);
-void change_menu_mode (bool mode);
+static void get_menu (void);
+static void print_menu (void);
+static void change_menu_mode (bool mode);
 
 /* MOVE SHIPS BLOCK */
-void move_ships (void);
-void generate_ship (void);
-void reverse_ship (void);
-void move_left (void);
-void move_right (void);
-void move_top (void);
-void move_bottom (void);
-bool set_ship (void);
+static void move_ships (void);
+static void generate_ship (void);
+static void reverse_ship (void);
+static void move_left (void);
+static void move_right (void);
+static void move_top (void);
+static void move_bottom (void);
+static bool set_ship (void);
 
 /* GAME BLOCK */
-void start_game (void);
-void generate_opp_map (void);
-bool boom_opp (void);
-char boom (void);
-void check_space (void);
-void check_target (void);
-void move_left_opp (void);
-void move_right_opp (void);
-void move_top_opp (void);
-void move_bottom_opp (void);
+static void start_game (void);
+static void generate_opp_map (void);
+static bool boom_opp (void);
+static char boom (void);
+static void check_space (void);
+static void check_target (void);
+static void move_left_opp (void);
+static void move_right_opp (void);
+static void move_top_opp (void);
+static void move_bottom_opp (void);
 
 /**********************************************/
 /*                 MAIN BLOCK                 */
@@ -189,14 +190,14 @@ int main (void) {
     return 0;
 }
 
-void print_result (char *s) {
+static void print_result (const char* const s) {
     printf("\n\n\n /*************************/"\
            "\n /*      RESULT: %s     */"\
            "\n /*************************/\n\n\n", s);
 }
 
-void print_map (void) {
-    unsigned char x, y;
+static void print_map (void) {
+    auto unsigned char x, y;
     clear();
     for (y = 0; y < MAP_Y; y++) {
         for (x = 0; x < MAP_X; x++)
@@ -209,8 +210,8 @@ void print_map (void) {
 /*                 MENU BLOCK                 */
 /**********************************************/
 
-void get_menu (void) {
-    char symbol;
+static void get_menu (void) {
+    auto char symbol;
 
     while(true) {
         print_menu();
@@ -225,8 +226,8 @@ void get_menu (void) {
     }
 }
 
-void print_menu (void) {
-    unsigned char x, y;
+static void print_menu (void) {
+    auto unsigned char x, y;
     clear(); printf("\n\v");
     for (y = 0; y < MENU_Y; y++) {
         printf("\t");
@@ -236,9 +237,9 @@ void print_menu (void) {
     }
 }
 
-void change_menu_mode (bool mode) {
-    unsigned x;
-    char c1, c2;
+static void change_menu_mode (bool mode) {
+    auto unsigned x;
+    auto char c1, c2;
 
     c1 = mode?'=':'-';
     c2 = mode?'-':'=';
@@ -258,8 +259,8 @@ void change_menu_mode (bool mode) {
 /*              MOVE SHIPS BLOCK              */
 /**********************************************/
 
-void move_ships (void) {
-    char symbol;
+static void move_ships (void) {
+    auto char symbol;
     generate_ship();
 
     while(true) {
@@ -285,8 +286,8 @@ void move_ships (void) {
     }
 }
 
-void generate_ship (void) {
-    unsigned char counter;
+static void generate_ship (void) {
+    auto unsigned char counter;
 
     for (counter = 0; counter < size_ship; counter++) {
         if (map[Y+counter][X] == SET_BLOCK)
@@ -295,8 +296,8 @@ void generate_ship (void) {
     }
 }
 
-void reverse_ship (void) {
-    unsigned char counter;
+static void reverse_ship (void) {
+    auto unsigned char counter;
 
     if (reversed) {
         if (Y+size_ship <= 11) {
@@ -325,8 +326,8 @@ void reverse_ship (void) {
     }
 }
 
-void move_left (void) {
-    unsigned char counter;
+static void move_left (void) {
+    auto unsigned char counter;
 
     if (reversed) {
         if (X != 3) {
@@ -353,8 +354,8 @@ void move_left (void) {
     }
 }
 
-void move_right (void) {
-    unsigned char counter;
+static void move_right (void) {
+    auto unsigned char counter;
 
     if (reversed) {
         if (X+(size_ship-1)*2 != 21) {
@@ -381,8 +382,8 @@ void move_right (void) {
     }
 }
 
-void move_top (void) {
-    unsigned char counter;
+static void move_top (void) {
+    auto unsigned char counter;
 
     if (reversed) {
         for (counter = 0; counter < size_ship; ++counter)
@@ -409,8 +410,8 @@ void move_top (void) {
     }
 }
 
-void move_bottom (void) {
-    unsigned char counter;
+static void move_bottom (void) {
+    auto unsigned char counter;
 
     if (reversed) {
         for (counter = 0; counter < size_ship; ++counter)
@@ -438,8 +439,8 @@ void move_bottom (void) {
     }
 }
 
-bool set_ship (void) {
-    unsigned char counter;
+static bool set_ship (void) {
+    auto unsigned char counter;
 
     if (reversed) {
         for (counter = 0; counter < size_ship; ++counter)
@@ -481,9 +482,9 @@ bool set_ship (void) {
 /*                 GAME BLOCK                 */
 /**********************************************/
 
-void start_game (void) {
-    char symbol;
-    char result;
+static void start_game (void) {
+    auto char symbol;
+    auto char result;
 
     size_ship = 4;
     count_ship = 10;
@@ -506,7 +507,7 @@ void start_game (void) {
                 result = boom();
                 
                 if (result == 1) { win = 1; return; } 
-                else if (result == -1) { return; } 
+                else if (result == -1) { win = 0; return; } 
                 else break;
 
             case 27: { win = -1; return; }
@@ -515,10 +516,10 @@ void start_game (void) {
     }
 }
 
-void generate_opp_map (void) {
-    unsigned char x, y;
-    unsigned char counter;
-    bool vertical;
+static void generate_opp_map (void) {
+    auto unsigned char x, y;
+    auto unsigned char counter;
+    auto bool vertical;
 
     again:
         vertical = rand() % 2;
@@ -561,8 +562,8 @@ void generate_opp_map (void) {
     } else return;
 }
 
-bool boom_opp (void) {
-    unsigned char x, y;
+static bool boom_opp (void) {
+    auto unsigned char x, y;
 
     again:
         x = 3 + rand() % 20;
@@ -588,7 +589,7 @@ bool boom_opp (void) {
     return false;
 }
 
-char boom (void) {
+static char boom (void) {
     if (map_opp[Y_opp][X_opp] == SET_BLOCK &&
         map_opp[Y_opp][X_opp] != HIT) {
 
@@ -612,7 +613,7 @@ char boom (void) {
     return 0;
 }
 
-void check_space (void) {
+static void check_space (void) {
     if (map[Y_opp][X_opp] == HIT)
         map[Y_opp][X_opp] = HIT;
 
@@ -622,7 +623,7 @@ void check_space (void) {
     else map[Y_opp][X_opp] = SPACE;
 }
 
-void check_target (void) {
+static void check_target (void) {
     if (map[Y_opp][X_opp] == HIT)
         map[Y_opp][X_opp] = HIT;
 
@@ -632,25 +633,25 @@ void check_target (void) {
     else map[Y_opp][X_opp] = TARGET;
 }
 
-void move_left_opp (void) {
+static void move_left_opp (void) {
     check_space();
     if (X_opp != 32) X_opp -= 2;
     check_target();
 }
 
-void move_right_opp (void) {
+static void move_right_opp (void) {
     check_space();
     if (X_opp != 50) X_opp += 2;
     check_target();
 }
 
-void move_top_opp (void) {
+static void move_top_opp (void) {
     check_space();
     if (Y_opp != 1) --Y_opp;
     check_target();
 }
 
-void move_bottom_opp (void) {
+static void move_bottom_opp (void) {
     check_space();
     if (Y_opp != 10) ++Y_opp;
     check_target();
