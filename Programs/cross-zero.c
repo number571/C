@@ -12,13 +12,32 @@
     #error "Platform is not supported"
 #endif
 
+void clear (void) {
+    #ifdef WINDOWS
+        printf("\033[2J");
+        printf("\033[0;0f");
+    #else
+        system("clear");
+    #endif
+}
+
+#ifdef UNIX
+    char getch (void) {
+        char ch;
+        system("stty raw");
+        ch = getchar();
+        system("stty cooked");
+        return ch;
+    }
+#endif
+
 enum {Y = 7, X = 13};
 typedef enum {false, true} bool;
 
 enum State { ZERO = 'O', CROSS = 'X' };
-enum State now = CROSS;
+static enum State now = CROSS;
 
-char map[Y][X] = {
+static char map[Y][X] = {
     "=============",
     "| 7 | 8 | 9 |",
     "=============",
@@ -41,40 +60,21 @@ char map[Y][X] = {
 #define CHANGE(x) (x = now)
 #define GOTO(x) if(x == ZERO || x == CROSS) goto again; else CHANGE(x);
 
-void menu (void);
-void game (void);
+static void menu (void);
+static void game (void);
 
-void printMap (void);
-bool checkWin (void);
+static void printMap (void);
+static bool checkWin (void);
 
-void restart (void);
+static void restart (void);
 
 int main (void) {
     menu();
     return 0;
 }
 
-void clear (void) {
-    #ifdef WINDOWS
-        printf("\033[2J");
-        printf("\033[0;0f");
-    #else
-        system("clear");
-    #endif
-}
-
-#ifdef UNIX
-    char getch (void) {
-        char ch;
-        system("stty raw");
-        ch = getchar();
-        system("stty cooked");
-        return ch;
-    }
-#endif
-
-void menu (void) {
-    char symbol;
+static void menu (void) {
+    auto char symbol;
     start:
         clear();
 
@@ -100,15 +100,15 @@ void menu (void) {
     goto restart;
 }
 
-void restart (void) {
+static void restart (void) {
     now = CROSS;
     NUM7 = '7'; NUM8 = '8'; NUM9 = '9';
     NUM4 = '4'; NUM5 = '5'; NUM6 = '6';
     NUM1 = '1'; NUM2 = '2'; NUM3 = '3';
 }
 
-void game (void) {
-    char symbol;
+static void game (void) {
+    auto char symbol;
     while(true) {
         again:
             printMap();
@@ -137,8 +137,8 @@ void game (void) {
     }
 }
 
-void printMap (void) {
-    unsigned char x, y;
+static void printMap (void) {
+    auto unsigned char x, y;
     
     clear(); printf("\n\v");
 
@@ -150,9 +150,9 @@ void printMap (void) {
     }
 }
 
-bool checkWin (void) {
-    bool win = false;
-    char temp;
+static bool checkWin (void) {
+    auto bool win = false;
+    auto char temp;
 
     /* HORIZONTAL */
 
