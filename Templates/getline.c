@@ -2,7 +2,7 @@
 
 #define LIMIT 128
 
-int getline_ (char str[], int lim);
+int getline_ (char s[], int lim);
 
 int main (void) {
     char string[LIMIT];
@@ -11,12 +11,12 @@ int main (void) {
     return 0;
 }
 
-int getline_ (char str[], int lim) {
+int getline_ (char s[], int lim) {
     int c, i = 0;
-    while (i < lim-1 && (c = getchar()) != EOF && c != '\n')
-        str[i++] = c;
+    while (--lim > 0 && (c = getchar()) != EOF && c != '\n')
+        s[i++] = c;
     if (c == '\n')
-        str[i++] = c;
-    str[i] = '\0';
+        s[i++] = c;
+    s[i] = '\0';
     return i;
 }
