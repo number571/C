@@ -1,34 +1,33 @@
 #include <stdio.h>
-#define MAX 100
+#define LIMIT 255
 
-void push(int symbol);
-int pop(void);
+double buffer[LIMIT];
+unsigned char count = 0;
 
-int buffer[MAX], stack = 0;
+void push (double num);
+double pop (void);
 
-int main(void) {
-
-    push(3); 
-    push(5);
+int main (void) {
+    push(3);
     push(7);
+    push(9);
 
-    printf("%d\n", pop());
-    printf("%d\n", pop());
-    printf("%d\n", pop());
-
+    printf("%lf\n", pop());
+    printf("%lf\n", pop());
+    printf("%lf\n", pop());
     return 0;
 }
 
-void push(int symbol) {
-    if (stack < MAX) 
-        buffer[stack++] = symbol;
-    else 
-        printf("Error: stack overflow!\n");
+void push (double num) {
+    if (count != LIMIT)
+        buffer[count++] = num;
+    else
+        printf("Buffer is full\n");
 }
 
-int pop(void) {
-    if (stack > 0) 
-        return buffer[--stack]; 
-    else 
-        printf("Error: stack = 0!\n");
+double pop (void) {
+    if (count != 0)
+        return buffer[--count];
+    else
+        printf("Buffer is void\n");
 }
