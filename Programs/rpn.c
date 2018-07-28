@@ -70,7 +70,7 @@ double pop (void) {
         return buffer[--count];
     else {
         printf("Buffer is void\n");
-        return 0.0
+        return 0.0;
     }
 }
 
