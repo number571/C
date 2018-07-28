@@ -16,7 +16,11 @@ int isdigit_ (char c);
 int isspace_ (char c);
 
 int main (void) {
-    char string[] = "1 2 - 4 5 + *";
+    char c, string[LIMIT]; // 1 2 - 4 5 + *
+    unsigned char index;
+    for (index = 0; (c = getchar()) != '\n' &&
+        index < LIMIT; index++)
+        string[index] = c;
     printf("%.2lf\n", calculate(string));
     return 0;
 }
