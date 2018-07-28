@@ -68,8 +68,10 @@ void push (double num) {
 double pop (void) {
     if (count != 0)
         return buffer[--count];
-    else
+    else {
         printf("Buffer is void\n");
+        return 0.0
+    }
 }
 
 double atof (char s[]) {
