@@ -26,7 +26,6 @@ int main (void) {
 }
 
 double calculate (char s[]) {
-
     double operand;
     unsigned char i;
     
