@@ -5,12 +5,10 @@ double buffer[LIMIT];
 unsigned char count = 0;
 
 double calculate (char s[]);
-
 void push (double num);
 double pop (void);
 
 double atof (char s[]);
-
 int isoperate (char c);
 int isdigit_ (char c);
 int isspace_ (char c);
