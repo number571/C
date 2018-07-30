@@ -3,10 +3,10 @@ EXEC_FILE = main
 
 .PHONY: default gcc tcc exe run wine clean
 
-default: $(CC) run
+default: compile run
 
 # Compilation
-gcc: main.o sys_call.o onion_path.o check_torrc.o edit_readme.o check_main_dir.o 
+compile: main.o sys_call.o onion_path.o check_torrc.o edit_readme.o check_main_dir.o 
 	gcc -o $(EXEC_FILE) main.o sys_call.o onion_path.o check_torrc.o edit_readme.o check_main_dir.o
 
 # Run the program
