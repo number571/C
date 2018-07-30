@@ -15,7 +15,7 @@ run:
 
 # Clear all files
 clean:
-	rm -rf $(EXEC_FILE) *.o *.i *.s *.exe
+	rm -rf $(EXEC_FILE) *.o *.i *.s
 
 # C_file to Object_file
 main.o: main.c
