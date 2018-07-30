@@ -1,7 +1,7 @@
 CC = gcc
 EXEC_FILE = main
 
-.PHONY: default gcc tcc exe run wine clean
+.PHONY: default compile run clean
 
 default: compile
 
