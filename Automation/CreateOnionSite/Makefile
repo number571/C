@@ -9,7 +9,7 @@ default: compile
 
 # Compilation
 compile: $(OBJECT_FILES)
-	gcc -o $(EXEC_FILE) $(OBJECT_FILES)
+	$(CC) -o $(EXEC_FILE) $(OBJECT_FILES)
 
 # Run the program
 run:
@@ -21,17 +21,17 @@ clean:
 
 # C_file to Object_file
 main.o: main.c
-	gcc -c -o main.o -save-temps main.c
+	$(CC) -c -o main.o -save-temps main.c
 sys_call.o: sys_call.c
-	gcc -c -o sys_call.o -save-temps sys_call.c
+	$(CC) -c -o sys_call.o -save-temps sys_call.c
 onion_path.o: onion_path.c
-	gcc -c -o onion_path.o -save-temps onion_path.c
+	$(CC) -c -o onion_path.o -save-temps onion_path.c
 check_torrc.o: check_torrc.c
-	gcc -c -o check_torrc.o -save-temps check_torrc.c
+	$(CC) -c -o check_torrc.o -save-temps check_torrc.c
 edit_readme.o: edit_readme.c
-	gcc -c -o edit_readme.o -save-temps edit_readme.c
+	$(CC) -c -o edit_readme.o -save-temps edit_readme.c
 check_main_dir.o: check_main_dir.c
-	gcc -c -o check_main_dir.o -save-temps check_main_dir.c
+	$(CC) -c -o check_main_dir.o -save-temps check_main_dir.c
 
 # Error if C_file was not found
 main.c: 
