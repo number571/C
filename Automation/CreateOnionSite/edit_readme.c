@@ -7,16 +7,16 @@ extern char array_changes[QUAN];
 extern unsigned char position;
 
 extern void edit_readme (void);
-static char check_exist_file (char *filename);
-static char *read_file (char *filename);
+static char check_exist_file (const char* const filename);
+static char* const read_file (const char* const filename);
 
 extern void edit_readme (void) {
-    struct List st_readme = { UNREADABLE, README_PATH };
+    auto struct List st_readme = { UNREADABLE, README_PATH };
     array_changes[position++] = check_exist_file(README_PATH);
 
-    FILE *readme;
-    bool changes = false;
-    unsigned char index;
+    auto FILE *readme;
+    auto bool changes = false;
+    auto unsigned char index;
 
     for (index = 0; index < QUAN; index++)
         if (array_changes[index] != READABLE) {
@@ -54,26 +54,24 @@ extern void edit_readme (void) {
     printf("[F_%s] => %s\n", CHECK_MODE(st_readme.mode), st_readme.path);
 }
 
-static char check_exist_file (char *filename) {
-    FILE *file = fopen(filename, "r");
+static char check_exist_file (const char* const filename) {
+    auto FILE* const file = fopen(filename, "r");
     if (file != NULL) {
         fclose(file);
         return READABLE;
     } else return UNREADABLE;
 }
 
-static char *read_file (char *filename) {
-    FILE *file = fopen(filename, "r");
+static char* const read_file (const char* const filename) {
+    auto char c;
+    auto unsigned int index = 0; 
+    auto FILE* const file = fopen(filename, "r");
     if (file != NULL) {
-        char c;
-        unsigned int index = 0; 
-        unsigned int length;
-        
         fseek(file, 0, SEEK_END);
-        length = ftell(file);
+            auto const unsigned int length = ftell(file);
         fseek(file, 0, SEEK_SET);
 
-        char *content = (char*) malloc(length * sizeof(char));
+        auto char *content = (char*) malloc(length * sizeof(char));
         while((c = getc(file)) != EOF)
             *(content + index++) = c;
         *(content + index) = '\0';
