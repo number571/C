@@ -63,12 +63,12 @@ static char check_exist_file (char *filename) {
 }
 
 static char *read_file (char *filename) {
-    char c;
-    unsigned int index = 0; 
-    unsigned int length;
-
     FILE *file = fopen(filename, "r");
     if (file != NULL) {
+        char c;
+        unsigned int index = 0; 
+        unsigned int length;
+        
         fseek(file, 0, SEEK_END);
         length = ftell(file);
         fseek(file, 0, SEEK_SET);
