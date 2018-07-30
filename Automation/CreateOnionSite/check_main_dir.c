@@ -11,9 +11,9 @@ static char check_exist_dir (char *dirname);
 static char check_exist_file (char *filename);
 
 extern void check_main_dir (void) {
-    char exist_main_dir = check_exist_dir(MAIN_DIR);
-    char exist_hostname = check_exist_file(HOST_FILE);
-    char exist_private_key = check_exist_file(KEY_FILE);
+    auto char exist_main_dir = check_exist_dir(MAIN_DIR);
+    auto char exist_hostname = check_exist_file(HOST_FILE);
+    auto char exist_private_key = check_exist_file(KEY_FILE);
 
     printf("[D_%s] => %s\n", CHECK_EXIST(exist_main_dir), MAIN_DIR);
     printf("[F_%s] => %s\n", CHECK_EXIST(exist_main_dir), HOST_FILE);
@@ -24,7 +24,7 @@ extern void check_main_dir (void) {
 }
 
 static char check_exist_dir (char *dirname) {
-    DIR *dir = opendir(dirname);
+    auto DIR *dir = opendir(dirname);
     if (dir != NULL) {
         closedir(dir);
         return READABLE;
@@ -32,7 +32,7 @@ static char check_exist_dir (char *dirname) {
 }
 
 static char check_exist_file (char *filename) {
-    FILE *file = fopen(filename, "r");
+    auto FILE *file = fopen(filename, "r");
     if (file != NULL) {
         fclose(file);
         return READABLE;
