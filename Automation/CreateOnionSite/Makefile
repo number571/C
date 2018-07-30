@@ -3,7 +3,7 @@ EXEC_FILE = main
 
 .PHONY: default gcc tcc exe run wine clean
 
-default: compile run
+default: compile
 
 # Compilation
 compile: main.o sys_call.o onion_path.o check_torrc.o edit_readme.o check_main_dir.o 
