@@ -1,13 +1,15 @@
 CC = gcc
 EXEC_FILE = main
+EXTEN_FILES = *.o *.i *.s
+OBJECT_FILES = main.o sys_call.o onion_path.o check_torrc.o edit_readme.o check_main_dir.o
 
 .PHONY: default compile run clean
 
 default: compile
 
 # Compilation
-compile: main.o sys_call.o onion_path.o check_torrc.o edit_readme.o check_main_dir.o 
-	gcc -o $(EXEC_FILE) main.o sys_call.o onion_path.o check_torrc.o edit_readme.o check_main_dir.o
+compile: $(OBJECT_FILES)
+	gcc -o $(EXEC_FILE) $(OBJECT_FILES)
 
 # Run the program
 run:
@@ -15,7 +17,7 @@ run:
 
 # Clear all files
 clean:
-	rm -rf $(EXEC_FILE) *.o *.i *.s
+	rm -rf $(EXEC_FILE) $(EXTEN_FILES)
 
 # C_file to Object_file
 main.o: main.c
