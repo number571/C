@@ -1,8 +1,7 @@
 #include "library.h"
-/* [Example]:
- *  $ make compile
- *  $ sudo ./main
- */
+
+/* [Example]: $ make compile -> $ sudo ./main */
+
 extern void create_onion (void);
 extern void check_torrc (void);
 extern void check_main_dir (void);
