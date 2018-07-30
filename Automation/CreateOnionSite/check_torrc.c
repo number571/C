@@ -10,7 +10,7 @@ extern void check_torrc (void);
 static char edit_torrc  (struct List *st_torrc);
 
 extern void check_torrc (void) {
-    struct List torrc  = { UNREADABLE, TORRC_PATH };
+    auto struct List torrc  = { UNREADABLE, TORRC_PATH };
 
     edit_torrc(&torrc); 
     printf("[F_%s] => %s\n", CHECK_MODE(torrc.mode), torrc.path);
@@ -21,11 +21,11 @@ extern void check_torrc (void) {
 }
 
 static char edit_torrc (struct List *st_torrc) {
-    struct Data hsd = { false, HIDDEN_SERVICE_DIR  "\n"};
-    struct Data hsp = { false, HIDDEN_SERVICE_PORT "\n"};
+    auto struct Data hsd = { false, HIDDEN_SERVICE_DIR  "\n"};
+    auto struct Data hsp = { false, HIDDEN_SERVICE_PORT "\n"};
 
-    char buffer[BUFF];
-    FILE *torrc;
+    auto char buffer[BUFF];
+    auto FILE *torrc;
 
     if ((torrc = fopen(st_torrc->path, "r")) != NULL) {
         while (fgets(buffer, BUFF, torrc) != NULL) {
