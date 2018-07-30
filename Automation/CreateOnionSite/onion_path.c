@@ -10,12 +10,12 @@ extern unsigned char position;
 extern void create_onion (void);
 static char edit_file   (struct List *st_file);
 static char edit_dir    (struct List *st_dir);
-static char *get_html_code (void);
+static char* const get_html_code (void);
 
 extern void create_onion (void) {
-    struct List www   = { UNREADABLE, WWW_PATH };
-    struct List onion = { UNREADABLE, ONION_PATH };
-    struct List html  = { UNREADABLE, HTML_FILE_PATH };
+    auto struct List www   = { UNREADABLE, WWW_PATH };
+    auto struct List onion = { UNREADABLE, ONION_PATH };
+    auto struct List html  = { UNREADABLE, HTML_FILE_PATH };
 
     edit_dir(&www); edit_dir(&onion); edit_file(&html);
 
@@ -32,12 +32,12 @@ extern void create_onion (void) {
 }
 
 static char edit_file (struct List *st_file) {
-    FILE *file;
+    auto FILE *file;
     if ((file = fopen(st_file->path, "r")) != NULL) {
         st_file->mode = READABLE;
         fclose(file);
     } else if ((file = fopen(st_file->path, "w")) != NULL) {
-        char *pointer = get_html_code();
+        auto char *pointer = get_html_code();
         st_file->mode = OVERWRITTEN;
         while (*pointer != '\0')
             putc(*pointer++, file);
@@ -47,7 +47,7 @@ static char edit_file (struct List *st_file) {
 }
 
 static char edit_dir (struct List *st_dir) {
-    DIR *directory;
+    auto DIR *directory;
     if ((directory = opendir(st_dir->path)) != NULL) {
         st_dir->mode = READABLE;
         closedir(directory);
@@ -57,7 +57,7 @@ static char edit_dir (struct List *st_dir) {
     return st_dir->mode;
 }
 
-static char *get_html_code (void) {
+static char* const get_html_code (void) {
     return
     "<!DOCTYPE html>\n"
     "<html>\n"
