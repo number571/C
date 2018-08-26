@@ -16,7 +16,7 @@ int main (void) {
 void right_shift (int arr[], unsigned len) {
     int temp = arr[len-1];
     unsigned i;
-    for (i = N-1; i > 0; i--)
+    for (i = len-1; i > 0; i--)
         arr[i] = arr[i-1];
     arr[0] = temp;
 }
