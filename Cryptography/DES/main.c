@@ -1,4 +1,4 @@
-#include "des.h"
+#include "library.h"
 #include <stdlib.h>
 
 #define ACTION_ENCRYPT "-e"
