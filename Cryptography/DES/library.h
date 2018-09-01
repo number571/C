@@ -7,7 +7,7 @@
 #define DECRYPTION_MODE 0
 
 typedef struct {
-	unsigned char k[8];
-	unsigned char c[4];
-	unsigned char d[4];
+    unsigned char k[8];
+    unsigned char c[4];
+    unsigned char d[4];
 } key_set;
