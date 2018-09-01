@@ -199,32 +199,23 @@ static void transposition (
 }
 
 extern void feistel_function (
-	const unsigned char* const message_piece, 
+	const unsigned char* const data_block, 
 	unsigned char processed_piece[], 
 	key_set* key_sets, 
 	const unsigned char mode
 ) {
-	unsigned char i, j;
-	unsigned char shift_size;
+	unsigned char i, j, shift_size, row, column, key_index;
+	unsigned char begin[DES_BLOCK], end[DES_BLOCK];
+	unsigned char l[4], r[4], ln[4], rn[4], er[6], ser[4];
 
-	unsigned char initial_permutation[DES_BLOCK];
-	unsigned char pre_end_permutation[DES_BLOCK];
-
-	unsigned char l[4], r[4];
-	unsigned char ln[4], rn[4], er[6], ser[4];
-
-	unsigned char row, column;
-
-	int key_index;
-
-	memset(initial_permutation, 0, DES_BLOCK);
+	memset(begin, 0, DES_BLOCK);
 	memset(processed_piece, 0, DES_BLOCK);
 
-	transposition(0, message_piece, initial_permutation);
+	transposition(0, data_block, begin);
 
 	for (i = 0; i < 4; i++) {
-		l[i] = initial_permutation[i];
-		r[i] = initial_permutation[i+4];
+		l[i] = begin[i];
+		r[i] = begin[i+4];
 	}
 
 	for (i = 0; i < 16; i++) {
@@ -298,9 +289,9 @@ extern void feistel_function (
 	}
 
 	for (j = 0; j < 4; j++) {
-		pre_end_permutation[j] = r[j];
-		pre_end_permutation[4+j] = l[j];
+		end[j] = r[j];
+		end[4+j] = l[j];
 	}
 
-	transposition(1, pre_end_permutation, processed_piece);
+	transposition(1, end, processed_piece);
 }
