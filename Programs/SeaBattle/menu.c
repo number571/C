@@ -3,19 +3,11 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#define MENU_X 16
-#define MENU_Y 6
 
-extern char getch (void);       /* FROM platform.c */
-extern void clear (void);       /* FROM platform.c */
+extern char getch (void);
+extern void clear (void);
+extern bool menu_mode;
 
-extern bool menu_mode;          /* TO main.c */
-bool menu_mode = true;
-
-extern void get_menu (void);    /* TO main.c */
-
-static void print_menu (void);              /* IN menu.c */
-static void change_menu_mode (bool mode);   /* IN menu.c */
 
 static char menu[MENU_Y][MENU_X] = {
     " ============== ",
@@ -26,24 +18,8 @@ static char menu[MENU_Y][MENU_X] = {
     " -------------- "
 };
 
-extern void get_menu (void) {
-    auto char symbol;
-
-    while(true) {
-        print_menu();
-        symbol = getch();
-
-        switch (toupper(symbol)) {
-            case 'A': case 'D': case 13: return;
-            case 'W': change_menu_mode(true); break;
-            case 'S': change_menu_mode(false); break;
-            default: break;
-        }
-    }
-}
-
 static void print_menu (void) {
-    auto unsigned char x, y;
+    unsigned char x, y;
     clear(); printf("\n\v");
     for (y = 0; y < MENU_Y; y++) {
         printf("\t");
@@ -54,8 +30,8 @@ static void print_menu (void) {
 }
 
 static void change_menu_mode (bool mode) {
-    auto unsigned x;
-    auto char c1, c2;
+    unsigned x;
+    char c1, c2;
 
     c1 = mode?'=':'-';
     c2 = mode?'-':'=';
@@ -69,4 +45,20 @@ static void change_menu_mode (bool mode) {
 
     menu_mode = mode;
     print_menu();
+}
+
+extern void get_menu (void) {
+    char symbol;
+
+    while(true) {
+        print_menu();
+        symbol = getch();
+
+        switch (toupper(symbol)) {
+            case 'A': case 'D': case 13: return;
+            case 'W': change_menu_mode(true); break;
+            case 'S': change_menu_mode(false); break;
+            default: break;
+        }
+    }
 }
