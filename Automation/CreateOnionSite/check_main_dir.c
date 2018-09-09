@@ -3,9 +3,6 @@
 #include <stdio.h>
 #include <dirent.h>
 
-extern char array_changes[QUAN];
-extern unsigned char position;
-
 static char check_exist_dir (const char* const dirname) {
     DIR* const dir = opendir(dirname);
     if (dir != NULL) {
