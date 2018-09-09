@@ -3,9 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-extern char array_changes[QUAN];
-extern unsigned char position;
-
 static char edit_torrc (struct List *st_torrc) {
     struct Data hsd = { false, HIDDEN_SERVICE_DIR  "\n" };
     struct Data hsp = { false, HIDDEN_SERVICE_PORT "\n" };
