@@ -1,7 +1,7 @@
 #pragma once
 
-#define CHECK_MODE(x) (x == 0)?"UNREADABLE":(x == 1)?"OVERWRITTEN":"READABLE"
-#define CHECK_EXIST(x) x?"READABLE":"OVERWRITTEN"
+#define CHECK_MODE(x) (x == 0)?"UNREADABLE":(x == 1)?"WRITTEN":"READABLE"
+#define CHECK_EXIST(x) x?"READABLE":"WRITTEN"
 
 #define QUAN 7
 #define BUFF 512
