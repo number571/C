@@ -3,9 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern char array_changes[QUAN];
-extern unsigned char position;
-
 static char check_exist_file (const char* const filename) {
     FILE* const file = fopen(filename, "r");
     if (file != NULL) {
