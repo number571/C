@@ -4,9 +4,6 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-extern char array_changes[QUAN];
-extern unsigned char position;
-
 static char* const get_html_code (void) {
     return
     "<!DOCTYPE html>\n"
