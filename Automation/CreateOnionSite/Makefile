@@ -1,14 +1,14 @@
 CC = gcc
 EXEC_FILE = main
 EXTEN_FILES = *.o *.i *.s
-OBJECT_FILES = main.o sys_call.o onion_path.o check_torrc.o edit_readme.o check_main_dir.o
+OBJECT_FILES = main.o sys_call.o onion_path.o check_torrc.o edit_readme.o check_main_dir.o extern_data.c
 
-.PHONY: default compile run clean
+.PHONY: default build run clean
 
-default: compile
+default: build
 
 # Compilation
-compile: $(OBJECT_FILES)
+build: $(OBJECT_FILES)
 	$(CC) -o $(EXEC_FILE) $(OBJECT_FILES)
 
 # Run the program
@@ -32,6 +32,8 @@ edit_readme.o: edit_readme.c
 	$(CC) -c -o edit_readme.o -save-temps edit_readme.c
 check_main_dir.o: check_main_dir.c
 	$(CC) -c -o check_main_dir.o -save-temps check_main_dir.c
+extern_data.o: extern_data.c
+	$(CC) -c -o extern_data.o -save-temps extern_data.c
 
 # Error if C_file was not found
 main.c: 
@@ -46,3 +48,5 @@ edit_readme.c:
 	$(error Error: edit_readme.c was not found)
 check_main_dir.c:
 	$(error Error: check_main_dir.c was not found)
+extern_data.c:
+	$(error Error: extern_data.c was not found)
