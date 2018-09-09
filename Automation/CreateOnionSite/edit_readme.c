@@ -6,17 +6,40 @@
 extern char array_changes[QUAN];
 extern unsigned char position;
 
-extern void edit_readme (void);
-static char check_exist_file (const char* const filename);
-static char* const read_file (const char* const filename);
+static char check_exist_file (const char* const filename) {
+    FILE* const file = fopen(filename, "r");
+    if (file != NULL) {
+        fclose(file);
+        return READABLE;
+    } else return UNREADABLE;
+}
+
+static char* const read_file (const char* const filename) {
+    char c;
+    unsigned int index = 0; 
+    FILE* const file = fopen(filename, "r");
+    if (file != NULL) {
+        fseek(file, 0, SEEK_END);
+            auto const unsigned int length = ftell(file);
+        fseek(file, 0, SEEK_SET);
+
+        auto char *content = (char*) malloc(length * sizeof(char));
+        while((c = getc(file)) != EOF)
+            *(content + index++) = c;
+        *(content + index) = '\0';
+
+        fclose(file);
+        return content;
+    } else return NULL;
+}
 
 extern void edit_readme (void) {
-    auto struct List st_readme = { UNREADABLE, README_PATH };
+    struct List st_readme = { UNREADABLE, README_PATH };
     array_changes[position++] = check_exist_file(README_PATH);
 
-    auto FILE *readme;
-    auto bool changes = false;
-    auto unsigned char index;
+    FILE *readme;
+    bool changes = false;
+    unsigned char index;
 
     for (index = 0; index < QUAN; index++)
         if (array_changes[index] != READABLE) {
@@ -52,31 +75,4 @@ extern void edit_readme (void) {
     }
 
     printf("[F_%s] => %s\n", CHECK_MODE(st_readme.mode), st_readme.path);
-}
-
-static char check_exist_file (const char* const filename) {
-    auto FILE* const file = fopen(filename, "r");
-    if (file != NULL) {
-        fclose(file);
-        return READABLE;
-    } else return UNREADABLE;
-}
-
-static char* const read_file (const char* const filename) {
-    auto char c;
-    auto unsigned int index = 0; 
-    auto FILE* const file = fopen(filename, "r");
-    if (file != NULL) {
-        fseek(file, 0, SEEK_END);
-            auto const unsigned int length = ftell(file);
-        fseek(file, 0, SEEK_SET);
-
-        auto char *content = (char*) malloc(length * sizeof(char));
-        while((c = getc(file)) != EOF)
-            *(content + index++) = c;
-        *(content + index) = '\0';
-
-        fclose(file);
-        return content;
-    } else return NULL;
 }
