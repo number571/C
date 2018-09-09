@@ -3,9 +3,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-extern void start_tor_service (void);
-extern void run_server (void);
-
 extern void start_tor_service (void) {
     system("systemctl start tor.service");
     system("systemctl restart tor.service");
