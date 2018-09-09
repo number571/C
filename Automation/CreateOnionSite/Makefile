@@ -1,7 +1,7 @@
 CC = gcc
 EXEC_FILE = main
 EXTEN_FILES = *.o *.i *.s
-OBJECT_FILES = main.o sys_call.o onion_path.o check_torrc.o edit_readme.o check_main_dir.o extern_data.c
+OBJECT_FILES = main.o sys_call.o onion_path.o check_torrc.o edit_readme.o check_main_dir.o extern_data.o
 
 .PHONY: default build run clean
 
