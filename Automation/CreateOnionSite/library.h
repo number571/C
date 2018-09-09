@@ -28,3 +28,6 @@ typedef enum {false, true} bool;
 
 struct List { char mode; char *path; };
 struct Data { bool exist; char *string; };
+
+extern char array_changes[QUAN];
+extern unsigned char position;
