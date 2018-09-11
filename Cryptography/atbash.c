@@ -2,15 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *atbash (char *message);
-char char_atbash (char ch);
+char *atbash (const char * const message);
+char char_atbash (const char ch);
 
 int main(void) {
-    printf("%s\n", atbash("HELLO, WORLD"));
+    printf("%s\n", atbash("SVOOL, DLIOW"));
     return 0;
 }
 
-char *atbash (char *message) {
+char *atbash (const char * const message) {
     unsigned long length = strlen(message);
     unsigned long i;
 
@@ -24,7 +24,7 @@ char *atbash (char *message) {
     return encrypted_message;
 }
 
-char char_atbash (char ch) {
+char char_atbash (const char ch) {
     char *reversed = "ZYXWVUTSRQPONMLKJIHGFEDCBA";
 
     if ('A' <= ch && ch <= 'Z') 
