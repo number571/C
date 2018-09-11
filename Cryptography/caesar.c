@@ -2,75 +2,39 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ENCRYPTION_MODE "-e"
-#define DECRYPTION_MODE "-d"
-
 #define LEN_ALPHA 26
-#define LEN_DIGIT 10
 
-#define ENCRYPT 1
-#define DECRYPT 0
+#define ENCRYPT  1
+#define DECRYPT -1
 
-// ./main -e 3 hello, world
+char *caesar (char mode, char key, char *message);
+char encrypt_char (char key, char ch);
 
-void encrypt_char (_Bool mode, char key, char ch);
-_Bool check_args (int argc, char *argv[]);
-void get_error (char *err);
+int main (void) {
 
-int main(int argc, char *argv[]) {
-
-    _Bool mode = check_args(argc, argv);
-
-    unsigned short length;
-    unsigned char i;
-
-    char key = (char)(atoi(argv[2]) % LEN_ALPHA);
-    key *= (key < 0) ? -1 : 1;
-    printf("%hhd\n", key);
-
-    char **p = (argv + 3);
-
-    while (p < argv + argc) {
-        length = strlen(*p);
-        for (i = 0; i < length; ++i)
-            encrypt_char(mode, key, (*p)[i]);
-        putchar(' ');
-        ++p;
-    }
-
-    printf("\n");
+    printf("%s\n", caesar(ENCRYPT, 3, "HELLO, WORLD"));
 
     return 0;
 }
 
-void encrypt_char (_Bool mode, char key, char ch) {
-    key *= mode ? 1 : -1;
+char *caesar (char mode, char key, char *message) {
+    unsigned long length = strlen(message);
+    unsigned long i;
 
+    key = ( (key < 0) ? (LEN_ALPHA + key) : (key) ) * mode;
+
+    char *encrypted_message = NULL;
+    encrypted_message = (char*)malloc(length + 1);
+
+    for (i = 0; i < length; ++i)
+        encrypted_message[i] = encrypt_char(key, message[i]);
+
+    return encrypted_message;
+}
+
+char encrypt_char (char key, char ch) {
     if ('A' <= ch && ch <= 'Z') 
-        putchar((ch + key + 13) % LEN_ALPHA + 'A');
+        return (ch + key + 13) % LEN_ALPHA + 'A';
 
-    else if ('a' <= ch && ch <= 'z')
-        putchar((ch + key + 7) % LEN_ALPHA + 'a');
-
-    else if ('0' <= ch && ch <= '9')
-        putchar((ch + key + 2) % LEN_DIGIT + '0');
-
-    else putchar(ch);
-}
-
-_Bool check_args (int argc, char *argv[]) {
-    if (argc < 4) get_error("len argc /= 4;");
-
-    if (!strcmp(argv[1], ENCRYPTION_MODE))
-        return ENCRYPT;
-
-    else if (!strcmp(argv[1], DECRYPTION_MODE))
-        return DECRYPT;
-
-    else get_error("Mode is not '-e' / '-d';");
-}
-
-void get_error (char *err) {
-    printf("Error: %s\n", err);
-    exit(1);
+    else return ch;
 }
