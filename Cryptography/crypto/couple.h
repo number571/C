@@ -27,7 +27,7 @@ _Bool set_vector_couple (char * const vector) {
 }
 
 _Bool couple (char * const to, char * const from) {
-    char length_alpha = strlen(__alpha_couple);
+    const char length_alpha = strlen(__alpha_couple);
 
     if (length_alpha != strlen(__vector_couple))
         return 1;

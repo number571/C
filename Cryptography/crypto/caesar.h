@@ -13,7 +13,7 @@ char _char_caesar (const char key, const char ch) {
 }
 
 _Bool set_alpha_caesar (char * const alpha) {
-    unsigned int length = strlen(alpha);
+    const unsigned int length = strlen(alpha);
     if (length >= MAX_CHAR_QUANTITY)
         return 1;
 

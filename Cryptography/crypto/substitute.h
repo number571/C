@@ -45,8 +45,8 @@ _Bool substitute (
     if (mode != ENCRYPT_MODE && mode != DECRYPT_MODE)
         return 1;
 
-    char *to_vector = (mode == ENCRYPT_MODE) ? __vector_substitute : __alpha_substitute;
-    char *from_vector = (mode == DECRYPT_MODE) ? __vector_substitute : __alpha_substitute;
+    char * const to_vector = (mode == ENCRYPT_MODE) ? __vector_substitute : __alpha_substitute;
+    char * const from_vector = (mode == DECRYPT_MODE) ? __vector_substitute : __alpha_substitute;
 
     char *p = NULL;
     for (p = from; *p != END_OF_STRING; ++p)

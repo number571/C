@@ -19,8 +19,7 @@ void set_vector_bacon (const char first, const char second) {
 }
 
 _Bool set_alpha_bacon (char * const alpha) {
-    unsigned int length = strlen(alpha);
-    if (length >= MAX_CHAR_QUANTITY)
+    if (strlen(alpha) >= MAX_CHAR_QUANTITY)
         return 1;
 
     char *p = NULL;
@@ -49,8 +48,8 @@ void _encrypt_bacon (char * const to, char * const from) {
 unsigned int _from_vector_to_alpha_bacon (
     char * const to,
     unsigned int position,
-    char * position_buffer,
-    char buffer[]
+    char * const position_buffer,
+    const char * const buffer
 ) {
     char x, sum = 0;
 

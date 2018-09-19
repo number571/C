@@ -2,13 +2,12 @@
 #include <string.h>
 #include <math.h>
 
-void variants (char *str, unsigned char size) {
-    unsigned char length = strlen(str);
-    unsigned int i;
-    int j;
-    for (i = 0; i < pow(length, size); ++i) {
-        for (j = size - 1; j >= 0; --j)
-           putchar(str[(char) (i / (pow(length, j)) ) % length]);
+void variants (const char * const str, const unsigned char size) {
+    const unsigned char length = strlen(str);
+    int x, y;
+    for (x = 0; x < pow(length, size); ++x) {
+        for (y = size - 1; y >= 0; --y)
+           putchar(str[(char) (x / (pow(length, y)) ) % length]);
         putchar('\n');
     }
 }

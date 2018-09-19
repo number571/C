@@ -27,7 +27,7 @@ char _char_vigenere (const char mode, char key, const char ch) {
 }
 
 _Bool set_alpha_vigenere (char * const alpha) {
-    unsigned int length = strlen(alpha);
+    const unsigned int length = strlen(alpha);
     if (length >= MAX_CHAR_QUANTITY)
         return 1;
 
@@ -44,13 +44,13 @@ _Bool set_alpha_vigenere (char * const alpha) {
 _Bool vigenere (
     char * const to,
     const char mode,
-    char * const key,
+    const char * const key,
     char * const from
 ) {
     if (mode != ENCRYPT_MODE && mode != DECRYPT_MODE)
         return 1;
 
-    unsigned int length = strlen(key);
+    const unsigned int length = strlen(key);
     char *p = NULL;
 
     for (p = from; *p != END_OF_STRING; ++p)
