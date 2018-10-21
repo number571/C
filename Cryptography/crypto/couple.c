@@ -1,64 +1,59 @@
+#include <string.h>
+
 #include "macro.h"
 #include "types.h"
 
-#include <string.h>
+static char __alpha_one_couple[MAX_LENGTH] = "ACEGIKMOQSUWY";
+static char __alpha_two_couple[MAX_LENGTH] = "BDFHJLNPRTVXZ";
 
-static char __alpha_couple[MAX_CHAR_QUANTITY]  = "ACEGIKMOQSUWY";
-static char __vector_couple[MAX_CHAR_QUANTITY] = "BDFHJLNPRTVXZ";
+static unsigned char __length_couple = LEN_ALPHA / 2;
 
-extern char set_alpha_couple (char * const vector) {
-    if (strlen(vector) >= MAX_CHAR_QUANTITY)
+extern char set_alpha_couple (char * const alph1, char * const alph2) {
+    const size_t length = strlen(alph1);
+
+    if (length >= MAX_LENGTH)
         return 1;
 
-    char *p = NULL;
-    for (p = vector; *p != END_OF_STRING; ++p)
-        __alpha_couple[p - vector] = *p;
+    if (length != strlen(alph2))
+        return 2;
+
+    for (char *px = alph1; *px != END_OF_STRING; ++px)
+        for (char *py = alph2; *py != END_OF_STRING; ++py)
+            if (*px == *py)
+                return 3;
+
+    __length_couple = (unsigned char)length;
+    unsigned char i = 0;
+
+    while (i < __length_couple) {
+        __alpha_one_couple[i] = alph1[i];
+        __alpha_two_couple[i] = alph2[i];
+        ++i;
+    }
+
+    __alpha_one_couple[i] = __alpha_two_couple[i] = END_OF_STRING;
 
     return 0;
 }
 
-extern char set_vector_couple (char * const vector) {
-    if (strlen(vector) >= MAX_CHAR_QUANTITY)
-        return 1;
+extern void couple (char * to, const char * from) {
+    for (bool flag; *from != END_OF_STRING; ++from, flag = false) {
+        for (unsigned char x = 0; x < __length_couple; ++x) {
 
-    char *p = NULL;
-    for (p = vector; *p != END_OF_STRING; ++p)
-        __vector_couple[p - vector] = *p;
-
-    return 0;
-}
-
-extern char couple (char * const to, char * const from) {
-    const char length_alpha = strlen(__alpha_couple);
-
-    if (length_alpha != strlen(__vector_couple))
-        return 1;
-
-    bool flag;
-    char x, *p = NULL;
-
-    for (p = from; *p != END_OF_STRING; ++p) {
-        flag = false;
-
-        for (x = 0; x < length_alpha; ++x) {
-            if (*p == __alpha_couple[x]) {
-                to[p - from] = __vector_couple[x];
+            if (*from == __alpha_one_couple[x]) {
+                *to++ = __alpha_two_couple[x];
                 flag = true;
                 break;
-            }
 
-            else if (*p == __vector_couple[x]) {
-                to[p - from] = __alpha_couple[x];
+            } else if (*from == __alpha_two_couple[x]) {
+                *to++ = __alpha_one_couple[x];
                 flag = true;
                 break;
             }
         }
 
-        if (!flag) 
-            to[p - from] = *p;
+        if (!flag) *to++ = *from;
     }  
-
-    to[p - from] = END_OF_STRING;
-
-    return 0;
+    
+    *to = END_OF_STRING;
 }

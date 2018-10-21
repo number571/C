@@ -1,5 +1,5 @@
 extern _Bool a1z26 (
-	char * const to, 
+	char * to, 
 	const char mode, 
-	char * const from
+	const char * from
 );

@@ -1,6 +1,5 @@
-extern char set_alpha_couple (char * const vector);
-extern char set_vector_couple (char * const vector);
-extern char couple (
-    char * const to, 
-    char * const from
+extern char set_alpha_couple (char * const alph1, char * const alph2);
+extern void couple (
+    char * to, 
+    const char * from
 );

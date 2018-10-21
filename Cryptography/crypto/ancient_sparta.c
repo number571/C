@@ -1,46 +1,47 @@
-#include "macro.h"
 #include <string.h>
+
+#include "macro.h"
 
 static char __default_char_ancient_sparta = 'Z';
 
 static void _encrypt_ancient_sparta (
-    char * const to, const char key, char * const from
+    char * to, const char key, const char * const from
 ) {
-    unsigned int x, start_length, final_length;
-    unsigned int y, block_length, position = 0;
-
+    size_t start_length, final_length;
     start_length = final_length = strlen(from);
 
     while (final_length % key != 0)
         ++final_length;
-    block_length = final_length / key;
+
+    const size_t block_length = final_length / key;
 
     char buffer[final_length + 1];
     strcpy(buffer, from);
 
     while (start_length++ < final_length)
-        buffer[start_length-1] = __default_char_ancient_sparta;
+        buffer[start_length - 1] = __default_char_ancient_sparta;
 
-    for (x = 0; x < block_length; ++x)
-        for (y = x; y < final_length; y += block_length)
-            to[position++] = buffer[y];
+    for (size_t x = 0; x < block_length; ++x)
+        for (size_t y = x; y < final_length; y += block_length)
+            *to++ = buffer[y];
 
-    to[position] = END_OF_STRING;
+    *to = END_OF_STRING;
 }
 
 static void _decrypt_ancient_sparta (
-    char * const to, const char key, char * const from
+    char * const to, const char key, const char * const from
 ) {
-    const unsigned int length = strlen(from);
-    unsigned int x, y, position = 0;
+    const size_t length = strlen(from);
 
     char buffer[length + 1];
+    char *p = buffer;
 
-    for (x = 0; x < key; ++x)
-        for (y = x; y < length; y += key)
-            buffer[position++] = from[y];
+    for (size_t x = 0; x < key; ++x)
+        for (size_t y = x; y < length; y += key)
+            *p++ = from[y];
 
-    buffer[position] = END_OF_STRING;
+    *p = END_OF_STRING;
+
     strcpy(to, buffer);
 }
 
@@ -49,12 +50,13 @@ extern void set_char_ancient_sparta (const char ch) {
 }
 
 extern char ancient_sparta (
-    char * const to, 
+    char * to, 
     const char mode, 
     const char key, 
-    char * const from
+    const char * const from
 ) {
-    if (key < 1) return 1;
+    if (key < 1) return 2;
+
     switch (mode) {
         case ENCRYPT_MODE: 
             _encrypt_ancient_sparta(to, key, from); 
@@ -62,7 +64,7 @@ extern char ancient_sparta (
         case DECRYPT_MODE: 
             _decrypt_ancient_sparta(to, key, from); 
         break;
-        default: return 2;
+        default: return 1;
     }
     return 0;
 }

@@ -1,7 +1,7 @@
-extern char set_alpha_caesar (char * const alpha);
+extern char set_alpha_caesar (const char * const alpha);
 extern char caesar (
-    char * const to, 
+    char * to, 
     const char mode, 
     char key, 
-    char * const from
+    const char * from
 );

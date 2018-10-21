@@ -1,12 +1,13 @@
 #include "macro.h"
-#define NULL ((void*) 0)
 
-extern char a1z26 (char * const to, const char mode, char * const from) {
+#define NULL ((void*) 0)
+#define END(x) ((mode == x) ? (END_OF_STRING) : (END_OF_NUMBER))
+
+extern char a1z26 (char * to, const char mode, const char * from) {
     if (mode != ENCRYPT_MODE && mode != DECRYPT_MODE)
         return 1;
 
     char buffer[2];
-    char *p = NULL;
 
     switch (mode) {
         case ENCRYPT_MODE:
@@ -19,11 +20,12 @@ extern char a1z26 (char * const to, const char mode, char * const from) {
         break;
     }
 
-    for (p = from; *p != END_OF_STRING; ++p)
-        if (buffer[0] <= *p && *p <= buffer[1])
-            to[p - from] = *p + (-mode * 'A') + mode;
+    for (; *from != END(ENCRYPT_MODE); ++from)
+        if (buffer[0] <= *from && *from <= buffer[1])
+            *to++ = *from + (-mode * 'A') + mode;
+        else
+            *to++ = *from + (mode * END_OF_NUMBER);
 
-    to[p - from] = END_OF_STRING;
-
+    *to = END(DECRYPT_MODE);
     return 0;
 }

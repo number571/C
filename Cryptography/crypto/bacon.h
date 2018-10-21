@@ -1,7 +1,8 @@
-extern void set_char_bacon (const char first, const char second);
-extern char set_alpha_bacon (char * const alpha);
+extern void set_char_bacon (const char ch1, const char ch2);
+extern char set_alpha_bacon (const char * const alpha);
+extern void print_bacon (const char * from);
 extern char bacon (
-    char * const to, 
+    char * to, 
     const char mode, 
-    char * const from
+    char * from
 );
