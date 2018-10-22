@@ -8,8 +8,6 @@
 
 #define BUFF 512
 
-char buffer[BUFF] = "hello, world";
-
 int main (void) {
     const int conn = socket(AF_INET, SOCK_STREAM, 0);
     if (conn < 0) {
@@ -26,6 +24,8 @@ int main (void) {
         fprintf(stderr, "Error: connect\n");
         return 2;
     }
+    
+    char buffer[BUFF] = "hello, world";
 
     send(conn, buffer, BUFF, 0);
     recv(conn, buffer, BUFF, 0);
