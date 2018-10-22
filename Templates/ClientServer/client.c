@@ -25,7 +25,11 @@ int main (void) {
         return 2;
     }
     
-    char buffer[BUFF] = "hello, world";
+    char buffer[BUFF];
+    char *p = buffer;
+
+    for (unsigned i = 0; (*p++ = getchar()) != '\n' && i < BUFF; ++i);
+    *(p - 1) = '\0';
 
     send(conn, buffer, BUFF, 0);
     recv(conn, buffer, BUFF, 0);
