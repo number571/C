@@ -12,7 +12,7 @@
 typedef enum {false, true} bool;
 
 int main (void) {
-    int listener = socket(AF_INET, SOCK_STREAM, 0);
+    const int listener = socket(AF_INET, SOCK_STREAM, 0);
     if (listener < 0) {
         fprintf(stderr, "Error: socket\n");
         return 1;
@@ -34,7 +34,7 @@ int main (void) {
     listen(listener, 1);
 
     while (true) {
-        int conn = accept(listener, NULL, NULL);
+        const int conn = accept(listener, NULL, NULL);
 
         if (conn < 0) {
             fprintf(stderr, "Error: accept\n");
@@ -42,7 +42,7 @@ int main (void) {
         }
 
         while (true) {
-            int length = recv(conn, buffer, BUFF, 0);
+            const int length = recv(conn, buffer, BUFF, 0);
             if (length <= 0) break;
             for (char *p = buffer; *p != '\0'; ++p)
                 *p = toupper(*p);
