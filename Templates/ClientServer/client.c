@@ -11,7 +11,7 @@
 char buffer[BUFF] = "hello, world";
 
 int main (void) {
-    int conn = socket(AF_INET, SOCK_STREAM, 0);
+    const int conn = socket(AF_INET, SOCK_STREAM, 0);
     if (conn < 0) {
         fprintf(stderr, "Error: socket\n");
         return 1;
