@@ -8,8 +8,7 @@
 
 #define BUFF 512
 
-char buffer[BUFF];
-const char message[100] = "hello, world";
+char buffer[BUFF] = "hello, world";
 
 int main (void) {
     int conn = socket(AF_INET, SOCK_STREAM, 0);
@@ -28,7 +27,7 @@ int main (void) {
         return 2;
     }
 
-    send(conn, message, sizeof(message), 0);
+    send(conn, buffer, BUFF, 0);
     recv(conn, buffer, BUFF, 0);
 
     printf("%s\n", buffer);
