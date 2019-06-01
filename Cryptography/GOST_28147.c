@@ -107,7 +107,7 @@ void feistel_cipher(uint8_t mode, uint32_t * block32b_1, uint32_t * block32b_2, 
 void round_of_feistel_cipher(uint32_t * block32b_1, uint32_t * block32b_2, uint32_t * keys32b, uint8_t round) {
 	uint32_t result_of_iter, temp;
 
-	result_of_iter = *block32b_1 + keys32b[round % 8] % UINT32_MAX;
+	result_of_iter = (*block32b_1 + keys32b[round % 8]) % UINT32_MAX;
 	result_of_iter = substitution_table(result_of_iter, round % 8);
 	result_of_iter = (uint32_t)LSHIFT_nBIT(result_of_iter, 11, 32);
 
