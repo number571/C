@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#define BUFF_SIZE 1024
+
 static uint32_t __Sbox[4][256] = {
 	{ // Sbox[0]
 		0xd1310ba6, 0x98dfb5ac, 0x2ffd72db, 0xd01adfb7, 0xb8e1afed, 0x6a267e96,
@@ -184,20 +186,23 @@ static uint32_t __Sbox[4][256] = {
 	},
 };
 
-void key_extension(uint32_t * to, uint8_t * keyNb, uint16_t key_bits);
-uint64_t blowfish(uint8_t mode, uint64_t block64b, uint32_t * keys32b);
+void key_extension(uint32_t * to, uint8_t * keyNb, uint16_t len_bits);
+size_t blowfish(uint8_t * to, uint8_t mode, uint32_t * keys32b, uint8_t * from, size_t length);
 
 void feistel_cipher(uint8_t mode, uint32_t * block32b_1, uint32_t * block32b_2, uint32_t * keys32b);
 void round_of_feistel_cipher(uint32_t * block32b_1, uint32_t * block32b_2, uint32_t key32b);
 uint32_t func_F(uint32_t block32b);
 
 void split_64bits_to_32bits(uint64_t block64b, uint32_t * block32b_1, uint32_t * block32b_2);
+void split_64bits_to_8bits(uint64_t block64b, uint8_t * blocks8b);
 void split_32bits_to_8bits(uint32_t block32b, uint8_t * blocks8b);
 
 uint64_t join_32bits_to_64bits(uint32_t block32b_1, uint32_t block32b_2);
 uint64_t join_8bits_to_64bits(uint8_t * blocks8b);
 uint64_t join_8bits_to_32bits(uint8_t * blocks8b);
 
+static inline size_t input_string(uint8_t * buffer);
+static inline void print_array(uint8_t * array, size_t length);
 static inline void print_bits(uint64_t x, register uint64_t Nbit);
 
 // PI = [K1..K18, S1..S4]
@@ -208,84 +213,94 @@ static uint32_t __Keys32b[18] = {
 };
 
 int main(void) {
-	uint8_t blocks8b[8] = "12345678";
-	uint8_t key32b[8] = "blowfish";
+	uint8_t encrypted[BUFF_SIZE], decrypted[BUFF_SIZE];
+	uint8_t buffer[BUFF_SIZE];
+	uint8_t key64b[8] = "blowfish";
 
-	uint64_t block64b = join_8bits_to_64bits(blocks8b);
-	print_bits(block64b, 64);
+	size_t length = input_string(buffer);
+	print_array(buffer, length);
 
-	key_extension(__Keys32b, key32b, 64);
+	key_extension(__Keys32b, key64b, 64);
 
-	uint64_t encrypted = blowfish('E', block64b, __Keys32b);
-	print_bits(encrypted, 64);
-	// printf("%016llx\n", encrypted);
+	length = blowfish(encrypted, 'E', __Keys32b, buffer, length);
+	print_array(encrypted, length);
 
-	uint64_t decrypted = blowfish('D', encrypted, __Keys32b);
-	print_bits(decrypted, 64);
+	length = blowfish(decrypted, 'D', __Keys32b, encrypted, length);
+	print_array(decrypted, length);
 
 	return 0;
 }
 
-void key_extension(uint32_t * to, uint8_t * keyNb, uint16_t key_bits) {
-	const uint8_t block_size_in_bytes = key_bits / 8;
+void key_extension(uint32_t * to, uint8_t * keyNb, uint16_t len_bits) {
+	const uint8_t block_size_in_bytes = len_bits / 8;
 	for (uint8_t i = 0; i < 18; ++i) {
 		to[i] ^= join_8bits_to_32bits(
 			keyNb + ((i * 4) % block_size_in_bytes)
 		);
 	}
-	uint64_t init_block64b = 0;
+	uint8_t init_blocks8b[8] = {0};
 	uint32_t N1, N2;
 	for (uint8_t i = 0; i < 18; i += 2) {
-		init_block64b = blowfish('E', init_block64b, __Keys32b);
-		split_64bits_to_32bits(init_block64b, &N1, &N2);
-		__Keys32b[i] = N1;
-		__Keys32b[i+1] = N2;
+		blowfish(init_blocks8b, 'E', __Keys32b, init_blocks8b, 8);
+		__Keys32b[i] = join_8bits_to_32bits(init_blocks8b);
+		__Keys32b[i+1] = join_8bits_to_32bits(init_blocks8b + 4);
 	}
 	for (uint8_t i = 0; i < 4; ++i) {
 		for (uint16_t j = 0; j < 256; j += 2) {
-			init_block64b = blowfish('E', init_block64b, __Keys32b);
-			split_64bits_to_32bits(init_block64b, &N1, &N2);
-			__Sbox[i][j] = N1;
-			__Sbox[i][j+1] = N2;
+			blowfish(init_blocks8b, 'E', __Keys32b, init_blocks8b, 8);
+			__Sbox[i][j] = join_8bits_to_32bits(init_blocks8b);
+			__Sbox[i][j+1] = join_8bits_to_32bits(init_blocks8b + 4);
 		}
 	}
 }
 
-uint64_t blowfish(uint8_t mode, uint64_t block64b, uint32_t * keys32b) {
+size_t blowfish(uint8_t * to, uint8_t mode, uint32_t * keys32b, uint8_t * from, size_t length) {
+	length = length % 8 == 0 ? length : length + (8 - (length % 8));
 	uint32_t N1, N2;
-	split_64bits_to_32bits(block64b, &N1, &N2);
-	feistel_cipher(mode, &N1, &N2, keys32b);
-	return join_32bits_to_64bits(N2, N1);
+
+	for (size_t i = 0; i < length; i += 8) {
+		split_64bits_to_32bits(
+			join_8bits_to_64bits(from + i), 
+			&N1, &N2
+		);
+		feistel_cipher(mode, &N1, &N2, keys32b);
+		split_64bits_to_8bits(
+			join_32bits_to_64bits(N2, N1),
+			(to + i)
+		);
+	}
+
+	return length;
 }
 
-void feistel_cipher(uint8_t mode, uint32_t * block32b_1, uint32_t * block32b_2, uint32_t * keys32b) {
+void feistel_cipher(uint8_t mode, uint32_t * N1, uint32_t * N2, uint32_t * keys32b) {
 	switch(mode) {
 		case 'E': case 'e': {
 			for (int8_t round = 0; round < 16; ++round) {
-				round_of_feistel_cipher(block32b_1, block32b_2, keys32b[round]);
+				round_of_feistel_cipher(N1, N2, keys32b[round]);
 			}
-			*block32b_2 ^= keys32b[17];
-			*block32b_1 ^= keys32b[16];
+			*N2 ^= keys32b[17];
+			*N1 ^= keys32b[16];
 			break;
 		}
 		case 'D': case 'd': {
 			for (int8_t round = 17; round > 1; --round) {
-				round_of_feistel_cipher(block32b_1, block32b_2, keys32b[round]);
+				round_of_feistel_cipher(N1, N2, keys32b[round]);
 			}
-			*block32b_2 ^= keys32b[0];
-			*block32b_1 ^= keys32b[1];
+			*N2 ^= keys32b[0];
+			*N1 ^= keys32b[1];
 			break;
 		}
 	}
 }
 
-void round_of_feistel_cipher(uint32_t * block32b_1, uint32_t * block32b_2, uint32_t key32b) {
+void round_of_feistel_cipher(uint32_t * N1, uint32_t * N2, uint32_t key32b) {
 	uint32_t temp;
-	*block32b_1 ^= key32b;
-	temp = *block32b_1;
-	*block32b_1 = func_F(*block32b_1);
-	*block32b_1 ^= *block32b_2;
-	*block32b_2 = temp;
+	*N1 ^= key32b;
+	temp = *N1;
+	*N1 = func_F(*N1);
+	*N1 ^= *N2;
+	*N2 = temp;
 }
 
 uint32_t func_F(uint32_t block32b) {
@@ -300,6 +315,12 @@ uint32_t func_F(uint32_t block32b) {
 void split_64bits_to_32bits(uint64_t block64b, uint32_t * block32b_1, uint32_t * block32b_2) {
 	*block32b_1 = (uint32_t)(block64b >> 32);
 	*block32b_2 = (uint32_t)(block64b);
+}
+
+void split_64bits_to_8bits(uint64_t block64b, uint8_t * blocks8b) {
+	for (size_t i = 0; i < 8; ++i) {
+		blocks8b[i] = (uint8_t)(block64b >> ((7 - i) * 8));
+	}
 }
 
 void split_32bits_to_8bits(uint32_t block32b, uint8_t * blocks8b) {
@@ -329,6 +350,22 @@ uint64_t join_8bits_to_32bits(uint8_t * blocks8b) {
 		block32b = (block32b << 8) | *p;
 	}
 	return block32b;
+}
+
+static inline size_t input_string(uint8_t * buffer) {
+	size_t position = 0;
+	uint8_t ch;
+	while ((ch = getchar()) != '\n' && position < BUFF_SIZE - 1)
+		buffer[position++] = ch;
+	buffer[position] = '\0';
+	return position;
+}
+
+static inline void print_array(uint8_t * array, size_t length) {
+	printf("[ ");
+	for (size_t i = 0; i < length; ++i)
+		printf("%d ", array[i]);
+	printf("]\n");
 }
 
 static inline void print_bits(uint64_t x, register uint64_t Nbit) {
