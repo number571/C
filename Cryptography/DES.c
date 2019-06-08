@@ -155,7 +155,6 @@ size_t DES(uint8_t * to, uint8_t mode, uint8_t * keys8b, uint8_t * from, size_t 
     length = length % 8 == 0 ? length : length + (8 - (length % 8));
     
     uint64_t keys48b[16] = {0};
-    uint64_t block64b;
     uint32_t N1, N2;
 
     key_extension(
