@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define BUFF_SIZE 1024
 #define LSHIFT_28BIT(x, L) ((((x) << (L)) | ((x) >> (-(L) & 27))) & (((uint64_t)1 << 32) - 1))
 
 static const uint8_t __Sbox[8][4][64] = {
@@ -98,7 +99,7 @@ static const uint8_t __P[32] = {
     2 , 8 , 24, 14, 32, 27, 3 , 9 , 19, 13, 30, 6 , 22, 11, 4 , 25,
 };
 
-uint64_t DES(uint8_t mode, uint64_t block64b, uint64_t key64b);
+size_t DES(uint8_t * to, uint8_t mode, uint8_t * keys8b, uint8_t * from, size_t length);
 
 void key_extension(uint64_t key64b, uint64_t * keys48b);
 void key_permutation_56bits_to_28bits(uint64_t block56b, uint32_t * block32b_1, uint32_t * block32b_2);
@@ -120,6 +121,7 @@ uint64_t initial_permutation(uint64_t block64b);
 uint64_t final_permutation(uint64_t block64b);
 
 void split_64bits_to_32bits(uint64_t block64b, uint32_t * block32b_1, uint32_t * block32b_2);
+void split_64bits_to_8bits(uint64_t block64b, uint8_t * blocks8b);
 void split_48bits_to_6bits(uint64_t block48b, uint8_t * blocks6b);
 
 uint64_t join_32bits_to_64bits(uint32_t block32b_1, uint32_t block32b_2);
@@ -128,32 +130,54 @@ uint64_t join_8bits_to_64bits(uint8_t * blocks8b);
 uint32_t join_4bits_to_32bits(uint8_t * blocks8b);
 
 static inline void swap(uint32_t * N1, uint32_t * N2);
+static inline size_t input_string(uint8_t * buffer);
 static inline void print_array(uint8_t * array, size_t length);
 static inline void print_bits(uint64_t x, register uint64_t Nbit);
 
 int main(void) {
-    uint8_t blocks8b[8] = "hellowor";
-    uint8_t keys8b[8] = "des_keys";
+    uint8_t encrypted[BUFF_SIZE], decrypted[BUFF_SIZE];
+    uint8_t buffer[BUFF_SIZE];
+    uint8_t keys8b[8] = "DESkey64";
 
-    uint64_t block64b = join_8bits_to_64bits(blocks8b);
-    uint64_t key64b = join_8bits_to_64bits(keys8b);
+    size_t length = input_string(buffer);
+    print_array(buffer, length);
 
-    block64b = DES('E', block64b, key64b);
-    printf("%016llx\n", block64b);
+    length = DES(encrypted, 'E', keys8b, buffer, length);
+    print_array(encrypted, length);
+
+    length = DES(decrypted, 'D', keys8b, encrypted, length);
+    print_array(decrypted, length);
 
     return 0;
 }
 
-uint64_t DES(uint8_t mode, uint64_t block64b, uint64_t key64b) {
+size_t DES(uint8_t * to, uint8_t mode, uint8_t * keys8b, uint8_t * from, size_t length) {
+    length = length % 8 == 0 ? length : length + (8 - (length % 8));
+    
     uint64_t keys48b[16] = {0};
+    uint64_t block64b;
     uint32_t N1, N2;
-    key_extension(key64b, keys48b);
-    block64b = initial_permutation(block64b);
-    split_64bits_to_32bits(block64b, &N1, &N2);
-    feistel_cipher(mode, &N1, &N2, keys48b);
-    block64b = join_32bits_to_64bits(N1, N2);
-    block64b = final_permutation(block64b);
-    return block64b;
+
+    key_extension(
+        join_8bits_to_64bits(keys8b), 
+        keys48b
+    );
+
+    for (size_t i = 0; i < length; i += 8) {
+        split_64bits_to_32bits(
+            initial_permutation(
+                join_8bits_to_64bits(from + i)
+            ), 
+            &N1, &N2
+        );
+        feistel_cipher(mode, &N1, &N2, keys48b);
+        split_64bits_to_8bits(
+            final_permutation(join_32bits_to_64bits(N1, N2)),
+            (to + i)
+        );
+    }
+
+    return length;
 }
 
 void feistel_cipher(uint8_t mode, uint32_t * N1, uint32_t * N2, uint64_t * keys48b) {
@@ -292,6 +316,12 @@ void split_64bits_to_32bits(uint64_t block64b, uint32_t * block32b_1, uint32_t *
     *block32b_2 = (uint32_t)(block64b);
 }
 
+void split_64bits_to_8bits(uint64_t block64b, uint8_t * blocks8b) {
+    for (size_t i = 0; i < 8; ++i) {
+        blocks8b[i] = (uint8_t)(block64b >> ((7 - i) * 8));
+    }
+}
+
 void split_48bits_to_6bits(uint64_t block48b, uint8_t * blocks6b) {
     for (uint8_t i = 0; i < 8; ++i) {
         blocks6b[i] = (block48b >> (58 - (i * 6))) << 2;
@@ -332,6 +362,15 @@ static inline void swap(uint32_t * N1, uint32_t * N2) {
     uint32_t temp = *N1;
     *N1 = *N2;
     *N2 = temp;
+}
+
+static inline size_t input_string(uint8_t * buffer) {
+    size_t position = 0;
+    uint8_t ch;
+    while ((ch = getchar()) != '\n' && position < BUFF_SIZE - 1)
+        buffer[position++] = ch;
+    buffer[position] = '\0';
+    return position;
 }
 
 static inline void print_array(uint8_t * array, size_t length) {
