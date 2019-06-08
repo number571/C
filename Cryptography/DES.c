@@ -171,7 +171,9 @@ size_t DES(uint8_t * to, uint8_t mode, uint8_t * keys8b, uint8_t * from, size_t 
         );
         feistel_cipher(mode, &N1, &N2, keys48b);
         split_64bits_to_8bits(
-            final_permutation(join_32bits_to_64bits(N1, N2)),
+            final_permutation(
+                join_32bits_to_64bits(N1, N2)
+            ),
             (to + i)
         );
     }
