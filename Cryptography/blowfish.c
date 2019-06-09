@@ -226,9 +226,6 @@ int main(void) {
 
     length = blowfish(encrypted, 'E', __Keys32b, buffer, length);
     print_array(encrypted, length);
-    for (uint8_t i = 0; i < 8; ++i)
-        printf("%x", encrypted[i]);
-    printf("\n");
 
     length = blowfish(decrypted, 'D', __Keys32b, encrypted, length);
     print_array(decrypted, length);
