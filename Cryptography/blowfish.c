@@ -202,6 +202,7 @@ uint64_t join_8bits_to_64bits(uint8_t * blocks8b);
 uint64_t join_8bits_to_32bits(uint8_t * blocks8b);
 
 static inline size_t input_string(uint8_t * buffer);
+static inline void swap(uint32_t * N1, uint32_t * N2);
 static inline void print_array(uint8_t * array, size_t length);
 static inline void print_bits(uint64_t x, register uint64_t Nbit);
 
@@ -225,6 +226,9 @@ int main(void) {
 
     length = blowfish(encrypted, 'E', __Keys32b, buffer, length);
     print_array(encrypted, length);
+    for (uint8_t i = 0; i < 8; ++i)
+        printf("%x", encrypted[i]);
+    printf("\n");
 
     length = blowfish(decrypted, 'D', __Keys32b, encrypted, length);
     print_array(decrypted, length);
@@ -266,7 +270,7 @@ size_t blowfish(uint8_t * to, uint8_t mode, uint32_t * keys32b, uint8_t * from, 
         );
         feistel_cipher(mode, &N1, &N2, keys32b);
         split_64bits_to_8bits(
-            join_32bits_to_64bits(N2, N1),
+            join_32bits_to_64bits(N1, N2),
             (to + i)
         );
     }
@@ -280,16 +284,18 @@ void feistel_cipher(uint8_t mode, uint32_t * N1, uint32_t * N2, uint32_t * keys3
             for (int8_t round = 0; round < 16; ++round) {
                 round_of_feistel_cipher(N1, N2, keys32b[round]);
             }
-            *N2 ^= keys32b[17];
-            *N1 ^= keys32b[16];
+            swap(N1, N2);
+            *N2 ^= keys32b[16];
+            *N1 ^= keys32b[17];
             break;
         }
         case 'D': case 'd': {
             for (int8_t round = 17; round > 1; --round) {
                 round_of_feistel_cipher(N1, N2, keys32b[round]);
             }
-            *N2 ^= keys32b[0];
-            *N1 ^= keys32b[1];
+            swap(N1, N2);
+            *N1 ^= keys32b[0];
+            *N2 ^= keys32b[1];
             break;
         }
     }
@@ -361,6 +367,12 @@ static inline size_t input_string(uint8_t * buffer) {
         buffer[position++] = ch;
     buffer[position] = '\0';
     return position;
+}
+
+static inline void swap(uint32_t * N1, uint32_t * N2) {
+    uint32_t temp = *N1;
+    *N1 = *N2;
+    *N2 = temp;
 }
 
 static inline void print_array(uint8_t * array, size_t length) {
