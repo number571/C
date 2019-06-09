@@ -232,23 +232,23 @@ int main(void) {
     return 0;
 }
 
-void key_extension(uint32_t * to, uint8_t * keyNb, uint16_t len_bits) {
+void key_extension(uint32_t * keys32b, uint8_t * keyNb, uint16_t len_bits) {
     const uint8_t block_size_in_bytes = len_bits / 8;
     for (uint8_t i = 0; i < 18; ++i) {
-        to[i] ^= join_8bits_to_32bits(
+        keys32b[i] ^= join_8bits_to_32bits(
             keyNb + ((i * 4) % block_size_in_bytes)
         );
     }
     uint8_t init_blocks8b[8] = {0};
     uint32_t N1, N2;
     for (uint8_t i = 0; i < 18; i += 2) {
-        blowfish(init_blocks8b, 'E', to, init_blocks8b, 8);
-        to[i] = join_8bits_to_32bits(init_blocks8b);
-        to[i+1] = join_8bits_to_32bits(init_blocks8b + 4);
+        blowfish(init_blocks8b, 'E', keys32b, init_blocks8b, 8);
+        keys32b[i] = join_8bits_to_32bits(init_blocks8b);
+        keys32b[i+1] = join_8bits_to_32bits(init_blocks8b + 4);
     }
     for (uint8_t i = 0; i < 4; ++i) {
         for (uint16_t j = 0; j < 256; j += 2) {
-            blowfish(init_blocks8b, 'E', to, init_blocks8b, 8);
+            blowfish(init_blocks8b, 'E', keys32b, init_blocks8b, 8);
             __Sbox[i][j] = join_8bits_to_32bits(init_blocks8b);
             __Sbox[i][j+1] = join_8bits_to_32bits(init_blocks8b + 4);
         }
