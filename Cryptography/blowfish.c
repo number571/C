@@ -241,7 +241,6 @@ void key_extension(uint32_t * keys32b, uint8_t * keyNb, uint16_t len_bits) {
         );
     }
     uint8_t init_blocks8b[8] = {0};
-    uint32_t N1, N2;
     for (uint8_t i = 0; i < 18; i += 2) {
         blowfish(init_blocks8b, 'E', keys32b, init_blocks8b, 8);
         keys32b[i] = join_8bits_to_32bits(init_blocks8b);
