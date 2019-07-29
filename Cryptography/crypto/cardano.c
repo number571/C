@@ -1,45 +1,68 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 
 #define ENCRYPT_MODE  1
 #define DECRYPT_MODE -1
 
-static void rotate90(uint8_t * matrix, size_t length);
-static void print_matrix(uint8_t * matrix, size_t length);
+#define END_OF_STRING '\0'
+#define SQUARE(x) ((x) * (x))
+
+static void rotate90(uint8_t * const matrix, const size_t length);
+static void print_matrix(const uint8_t * const matrix, const size_t length);
+static void encrypt(
+    uint8_t * const to,
+    const uint8_t const key[][2],
+    const size_t key_length,
+    const size_t matrix_length,
+    const uint8_t * const from,
+    const size_t length
+);
+static void decrypt(
+    uint8_t * const to,
+    const uint8_t const key[][2],
+    const size_t key_length,
+    const size_t matrix_length,
+    const uint8_t * const from,
+    const size_t length
+);
 extern char cardano(
-    uint8_t * to,
+    uint8_t * const to,
     const int8_t mode,
-    uint8_t coord[][2],
-    size_t coord_len,
-    size_t matrix_len,
-    uint8_t * from,
-    size_t length
+    const uint8_t const key[][2],
+    const size_t key_length,
+    const size_t matrix_length,
+    const uint8_t * const from,
+    const size_t length
 );
 
 int main(void) {
-    uint8_t message[20] = "SECRET";
-    uint8_t coord[][2] = {
-        {0, 1},
-        {1, 0},
-    };
-    cardano(message, ENCRYPT_MODE, coord, 2, 4, message, strlen(message));
-    print_matrix(message, 4);
+    uint8_t message[26] = "SECRET";
+    uint8_t key[][2] = { {2, 1}, {2, 4}, {3, 3} };
 
+    const size_t length = strlen(message);
+    const size_t matrix_length = 5;
+    const size_t key_length = 3;
+
+    cardano(message, ENCRYPT_MODE, key, key_length, matrix_length, message, length);
+    print_matrix(message, matrix_length);
+    printf("%s\n", message);
     return 0;
 }
 
-static void print_matrix(uint8_t * matrix, size_t length) {
+static void print_matrix(const uint8_t * const matrix, const size_t length) {
     for (size_t i = 0; i < length; ++i) {
         for (size_t j = 0; j < length; ++j) {
-            printf("%c", matrix[i * length + j]);
+            printf("%c ", matrix[i * length + j]);
         }
         putchar('\n');
     }
 }
 
-static void rotate90(uint8_t * matrix, size_t length) {
-    const size_t size = length * length;
+static void rotate90(uint8_t * const matrix, const size_t length) {
+    const size_t size = SQUARE(length);
     uint8_t rotated[size];
     for (size_t i = 0; i < length; ++i) {
         for (size_t j = 0; j < length; ++j) {
@@ -49,36 +72,84 @@ static void rotate90(uint8_t * matrix, size_t length) {
     memcpy(matrix, rotated, size);
 }
 
-extern char cardano(
-    uint8_t * to,
-    const int8_t mode,
-    uint8_t coord[][2],
-    size_t coord_len,
-    size_t matrix_len,
-    uint8_t * from,
-    size_t length
+static void encrypt(
+    uint8_t * const to,
+    const uint8_t const key[][2],
+    const size_t key_length,
+    const size_t matrix_length,
+    const uint8_t * const from,
+    const size_t length
 ) {
-    if (mode != ENCRYPT_MODE && mode != DECRYPT_MODE) {
-        return 1;
-    }
-
-    const size_t size = matrix_len * matrix_len;
-    uint8_t buffer[size];
-    memcpy(buffer, from, size);
-
+    const size_t matrix_size = SQUARE(matrix_length);
+    uint8_t buffer[matrix_size];
     size_t position = 0;
 
-    for (size_t i = 0; i < 4; ++i) {
-        for (size_t j = 0; j < coord_len; ++j) {
-            buffer[coord[j][0] * length + coord[j][1]] = from[position++];
-            if (position == length) {
-                goto end_cardano;
-            }
-        }
-        rotate90(buffer, matrix_len);
+    memcpy(buffer, from, matrix_size);
+
+    srand(time(NULL));
+    for (size_t i = 0; i < matrix_size; ++i) {
+        buffer[i] = rand() % 26 + 65;
     }
 
-end_cardano:
-    memcpy(to, buffer, size);
+    for (size_t i = 0; i < 4; ++i) {
+        for (size_t j = 0; j < key_length; ++j) {
+            if (position == length) {
+                break;
+            } 
+            buffer[key[j][0] * matrix_length + key[j][1]] = from[position++];
+        }
+        rotate90(buffer, matrix_length);
+    }
+
+    memcpy(to, buffer, matrix_size);
+}
+
+static void decrypt(
+    uint8_t * const to,
+    const uint8_t const key[][2],
+    const size_t key_length,
+    const size_t matrix_length,
+    const uint8_t * const from,
+    const size_t length
+) {
+    const size_t matrix_size = SQUARE(matrix_length);
+    uint8_t buffer[matrix_size];
+    size_t position = 0;
+
+    memcpy(buffer, from, matrix_size);
+
+    for (size_t i = 0; i < 4; ++i) {
+        for (size_t j = 0; j < key_length; ++j) {
+            if (position == length) {
+                goto end_decrypt;
+            } 
+            to[position++] = buffer[key[j][0] * matrix_length + key[j][1]];
+        }
+        rotate90(buffer, matrix_length);
+    }
+
+end_decrypt:
+    to[position] = END_OF_STRING;
+}
+
+extern char cardano(
+    uint8_t * const to,
+    const int8_t mode,
+    const uint8_t const key[][2],
+    const size_t key_length,
+    const size_t matrix_length,
+    const uint8_t * const from,
+    const size_t length
+) {
+    switch (mode) {
+        case ENCRYPT_MODE: 
+            encrypt(to, key, key_length, matrix_length, from, length);
+        break;
+        case DECRYPT_MODE:
+            decrypt(to, key, key_length, matrix_length, from, length);
+        break;
+        default: return 1;
+    }
+
     return 0;
 }
