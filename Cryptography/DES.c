@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <stdlib.h>
 
 #define BUFF_SIZE 1024
 #define LSHIFT_28BIT(x, L) ((((x) << (L)) | ((x) >> (-(L) & 27))) & (((uint64_t)1 << 32) - 1))
 
-static const uint8_t __Sbox[8][4][64] = {
+static const uint8_t __Sbox[8][4][16] = {
     { // 0
         {14, 4 , 13, 1 , 2 , 15, 11, 8 , 3 , 10, 6 , 12, 5 , 9 , 0 , 7 },
         {0 , 15, 7 , 4 , 14, 2 , 13, 1 , 10, 6 , 12, 11, 9 , 5 , 3 , 8 },
@@ -101,15 +100,15 @@ static const uint8_t __P[32] = {
 
 size_t DES(uint8_t * to, uint8_t mode, uint8_t * keys8b, uint8_t * from, size_t length);
 
-void key_extension(uint64_t key64b, uint64_t * keys48b);
+void key_expansion(uint64_t key64b, uint64_t * keys48b);
 void key_permutation_56bits_to_28bits(uint64_t block56b, uint32_t * block32b_1, uint32_t * block32b_2);
-void key_extension_to_48bits(uint32_t block28b_1, uint32_t block28b_2, uint64_t * keys48b);
+void key_expansion_to_48bits(uint32_t block28b_1, uint32_t block28b_2, uint64_t * keys48b);
 uint64_t key_contraction_permutation(uint64_t block56b);
 
 void feistel_cipher(uint8_t mode, uint32_t * N1, uint32_t * N2, uint64_t * keys48b);
 void round_feistel_cipher(uint32_t * N1, uint32_t * N2, uint64_t key48b);
 uint32_t func_F(uint32_t block32b, uint64_t key48b);
-uint64_t extension_permutation(uint32_t block32b);
+uint64_t expansion_permutation(uint32_t block32b);
 uint32_t substitutions(uint64_t block48b);
 void substitution_6bits_to_4bits(uint8_t * blocks6b, uint8_t * blocks4b);
 uint32_t permutation(uint32_t block32b);
@@ -129,15 +128,15 @@ uint64_t join_28bits_to_56bits(uint32_t block28b_1, uint32_t block28b_2);
 uint64_t join_8bits_to_64bits(uint8_t * blocks8b);
 uint32_t join_4bits_to_32bits(uint8_t * blocks8b);
 
-static inline void swap(uint32_t * N1, uint32_t * N2);
 static inline size_t input_string(uint8_t * buffer);
+static inline void swap(uint32_t * N1, uint32_t * N2);
 static inline void print_array(uint8_t * array, size_t length);
 static inline void print_bits(uint64_t x, register uint64_t Nbit);
 
 int main(void) {
     uint8_t encrypted[BUFF_SIZE], decrypted[BUFF_SIZE];
-    uint8_t buffer[BUFF_SIZE];
-    uint8_t keys8b[8] = "DESkey64";
+    uint8_t buffer[BUFF_SIZE] = {0};
+    uint8_t keys8b[8] = "DESkey56";
 
     size_t length = input_string(buffer);
     print_array(buffer, length);
@@ -157,7 +156,7 @@ size_t DES(uint8_t * to, uint8_t mode, uint8_t * keys8b, uint8_t * from, size_t 
     uint64_t keys48b[16] = {0};
     uint32_t N1, N2;
 
-    key_extension(
+    key_expansion(
         join_8bits_to_64bits(keys8b), 
         keys48b
     );
@@ -207,13 +206,13 @@ void round_feistel_cipher(uint32_t * N1, uint32_t * N2, uint64_t key48b) {
 }
 
 uint32_t func_F(uint32_t block32b, uint64_t key48b) {
-    uint64_t block48b = extension_permutation(block32b);
+    uint64_t block48b = expansion_permutation(block32b);
     block48b ^= key48b;
     block32b = substitutions(block48b);
     return permutation(block32b);
 }
 
-uint64_t extension_permutation(uint32_t block32b) {
+uint64_t expansion_permutation(uint32_t block32b) {
     uint64_t block48b = 0;
     for (uint8_t i = 0 ; i < 48; ++i) {
         block48b |= (uint64_t)((block32b >> (32 - __EP[i])) & 0x01) << (63 - i);
@@ -274,10 +273,10 @@ uint64_t final_permutation(uint64_t block64b) {
     return new_block64b;
 }
 
-void key_extension(uint64_t key64b, uint64_t * keys48b) {
+void key_expansion(uint64_t key64b, uint64_t * keys48b) {
     uint32_t K1 = 0, K2 = 0;
     key_permutation_56bits_to_28bits(key64b, &K1, &K2);
-    key_extension_to_48bits(K1, K2, keys48b);
+    key_expansion_to_48bits(K1, K2, keys48b);
 }
 
 void key_permutation_56bits_to_28bits(uint64_t block56b, uint32_t * block28b_1, uint32_t * block28b_2) {
@@ -287,7 +286,7 @@ void key_permutation_56bits_to_28bits(uint64_t block56b, uint32_t * block28b_1, 
     }
 }
 
-void key_extension_to_48bits(uint32_t block28b_1, uint32_t block28b_2, uint64_t * keys48b) {
+void key_expansion_to_48bits(uint32_t block28b_1, uint32_t block28b_2, uint64_t * keys48b) {
     uint64_t block56b;
     uint8_t n;
 
@@ -359,12 +358,6 @@ uint32_t join_4bits_to_32bits(uint8_t * blocks4b) {
     return block32b;
 }
 
-static inline void swap(uint32_t * N1, uint32_t * N2) {
-    uint32_t temp = *N1;
-    *N1 = *N2;
-    *N2 = temp;
-}
-
 static inline size_t input_string(uint8_t * buffer) {
     size_t position = 0;
     uint8_t ch;
@@ -372,6 +365,12 @@ static inline size_t input_string(uint8_t * buffer) {
         buffer[position++] = ch;
     buffer[position] = '\0';
     return position;
+}
+
+static inline void swap(uint32_t * N1, uint32_t * N2) {
+    uint32_t temp = *N1;
+    *N1 = *N2;
+    *N2 = temp;
 }
 
 static inline void print_array(uint8_t * array, size_t length) {
