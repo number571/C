@@ -57,6 +57,7 @@ const uint32_t Rcon[11] = {
 };
 
 size_t AES(uint8_t * to, uint8_t mode, uint8_t * key, uint8_t key_size, uint8_t * from, size_t length);
+void key_expansion(uint32_t * Wkey, uint8_t * key, uint8_t Nb, uint8_t Nk, uint8_t Nr);
 
 void inv_sub_bytes(uint8_t * block);
 void sub_bytes(uint8_t * block);
@@ -68,7 +69,6 @@ void inv_mix_columns(uint8_t * block);
 void mix_columns(uint8_t * block);
 
 void add_round_key(uint8_t * block, uint32_t * Wkeys);
-
 uint8_t GF_mul(uint8_t a, uint8_t b);
 
 void shiftr_array(uint8_t * array, size_t length, size_t shift);
@@ -107,45 +107,12 @@ int main(void) {
     return 0;
 }
 
-void key_expansion(uint32_t * Wkey, uint8_t * key, uint8_t Nb, uint8_t Nk, uint8_t Nr) {
-    for (uint8_t i = 0; i < Nk; ++i) {
-        Wkey[i] = join_8bits_to_32bits(key + (4 * i));
-    }
-
-    uint32_t T;
-    for (size_t i = Nk; i < (Nb * (Nr + 1)); ++i) {
-        T = Wkey[i-1];
-        if (i % Nk == 0) {
-            T = sub_word(rot_word(T)) ^ Rcon[i/Nk];
-        } else if (Nk == 8 && (i % Nk) == 4) {
-            T = sub_word(T);
-        } 
-        Wkey[i] = Wkey[i-Nk] ^ T;
-    }
-}
-
-uint32_t sub_word(uint32_t word) {
-    uint8_t bytes[4];
-    split_32bits_to_8bits(word, bytes);
-    for (uint8_t i = 0; i < 4; ++i) {
-        bytes[i] = Sbox[bytes[i]];
-    }
-    return join_8bits_to_32bits(bytes);
-}
-
-uint32_t rot_word(uint32_t word) {
-    uint8_t bytes[4];
-    split_32bits_to_8bits(word, bytes);
-    shiftl_array(bytes, 4, 1);
-    return join_8bits_to_32bits(bytes);
-}
-
 size_t AES(uint8_t * to, uint8_t mode, uint8_t * key, uint8_t key_size, uint8_t * from, size_t length) {
     if ((key_size != 16 && key_size != 24 && key_size != 32) || (mode != 'E' && mode != 'D')) {
         return -1;
     }
 
-    length = length % key_size == 0 ? length : length + (key_size - (length % key_size));
+    length = (length % key_size == 0) ? length : length + (key_size - (length % key_size));
 
     const uint8_t Nb = 4;
     const uint8_t Nk = key_size / Nb;
@@ -193,6 +160,38 @@ size_t AES(uint8_t * to, uint8_t mode, uint8_t * key, uint8_t key_size, uint8_t 
     }
     
     return length;
+}
+
+void key_expansion(uint32_t * Wkey, uint8_t * key, uint8_t Nb, uint8_t Nk, uint8_t Nr) {
+    for (uint8_t i = 0; i < Nk; ++i) {
+        Wkey[i] = join_8bits_to_32bits(key + (4 * i));
+    }
+    uint32_t T;
+    for (size_t i = Nk; i < (Nb * (Nr + 1)); ++i) {
+        T = Wkey[i-1];
+        if (i % Nk == 0) {
+            T = sub_word(rot_word(T)) ^ Rcon[i/Nk];
+        } else if (Nk == 8 && (i % Nk) == 4) {
+            T = sub_word(T);
+        } 
+        Wkey[i] = Wkey[i-Nk] ^ T;
+    }
+}
+
+uint32_t sub_word(uint32_t word) {
+    uint8_t bytes[4];
+    split_32bits_to_8bits(word, bytes);
+    for (uint8_t i = 0; i < 4; ++i) {
+        bytes[i] = Sbox[bytes[i]];
+    }
+    return join_8bits_to_32bits(bytes);
+}
+
+uint32_t rot_word(uint32_t word) {
+    uint8_t bytes[4];
+    split_32bits_to_8bits(word, bytes);
+    shiftl_array(bytes, 4, 1);
+    return join_8bits_to_32bits(bytes);
 }
 
 void copy_transpose_block(uint8_t * to, uint8_t * from) {
