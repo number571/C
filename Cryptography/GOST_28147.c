@@ -196,13 +196,13 @@ void split_64bits_to_8bits(uint64_t block64b, uint8_t * blocks8b) {
     }
 }
 
-void split_32bits_to_8bits(uint32_t block32b, uint8_t * blocks4b) {
+void split_32bits_to_8bits(uint32_t block32b, uint8_t * blocks8b) {
     for (uint8_t i = 0; i < 4; ++i) {
-        // blocks4b[0] = (uint8_t)10111101000101010100101110100010 >> (28 - (0 * 8)) =
+        // blocks8b[0] = (uint8_t)10111101000101010100101110100010 >> (28 - (0 * 8)) =
         // = (uint8_t)10101010101010101010101010101010 >> 28 = 
         // = (uint8_t)00000000000000000000000010111101
         // = 10111101
-        blocks4b[i] = (uint8_t)(block32b >> (24 - (i * 8)));
+        blocks8b[i] = (uint8_t)(block32b >> (24 - (i * 8)));
     }
 }
 
