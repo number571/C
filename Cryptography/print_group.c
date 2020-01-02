@@ -1,14 +1,26 @@
 #include <stdio.h>
 #include <stdint.h>
 
+int8_t L(uint64_t a, uint64_t p);
 uint64_t addmod(uint64_t x, uint64_t y, uint64_t n);
 uint64_t mulmod(uint64_t x, uint64_t y, uint64_t n);
 uint64_t powmod(uint64_t x, uint64_t y, uint64_t n);
 void print_group(uint64_t n, uint64_t (*groupf) (uint64_t, uint64_t, uint64_t));
 
 int main(void) {
-    print_group(5, powmod);
+    uint64_t p = 11;
+    print_group(p, powmod);
     return 0;
+}
+
+/*
+ 1 = Квадратичный вычет;
+-1 = Квадратичный невычет;
+ 0 = a | p;
+*/
+int8_t L(uint64_t a, uint64_t p) {
+    uint64_t x = powmod(a, (p - 1) / 2, p);
+    return (x == p - 1) ? -1 : x;
 }
 
 uint64_t addmod(uint64_t x, uint64_t y, uint64_t n) {
