@@ -3,293 +3,198 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define SIZE   10
 #define MODULO 1000000000
-#define MAX(x, y) ((x > y) ? (x) : (y))
 
-typedef struct {
-	int8_t   sign;
+typedef struct BigInt {
 	uint32_t *number;
-	uint32_t size;
-	uint32_t len;
+	size_t count;
+	size_t size;
 } BigInt;
 
-BigInt *new_bigint(uint64_t x);
+static void _swap(uint8_t *array, size_t size) {
+	uint8_t temp;
+	for (size_t i = 0, j = size-1; i < size / 2; ++i, --j) {
+		temp = array[i];
+		array[i] = array[j];
+		array[j] = temp;
+	}
+}
 
-BigInt *mod_bigint(BigInt *x, BigInt *y);
-BigInt *div_bigint(BigInt *x, BigInt *y);
-BigInt *mul_bigint(BigInt *x, BigInt *y);
-BigInt *sub_bigint(BigInt *x, BigInt *y);
-BigInt *add_bigint(BigInt *x, BigInt *y);
-BigInt *cpy_bigint(BigInt *x, BigInt *y);
-BigInt *xchg_bigint(BigInt *x, BigInt *y);
-BigInt *neg_bigint(BigInt *x);
+static void _inc_count_bigint(BigInt *x) {
+	x->count += 1;
+	if (x->count == x->size) {
+		x->size <<= 1;
+		x->number = (uint32_t*)realloc(x->number, x->size * sizeof(uint32_t));
+		memset(x->number + x->count, 0, (x->size - x->count) * sizeof(uint32_t));
+	}
+}
 
-int8_t cmps_bigint(BigInt *x, BigInt *y);
-int8_t cmp_bigint(BigInt *x, BigInt *y);
+static void _set_count_bigint(BigInt *x, BigInt *y) {
+	if (x->size < y->size) {
+		x->size = y->size;
+		x->number = (uint32_t*)realloc(x->number, x->size * sizeof(uint32_t));
+		memset(x->number + x->count, 0, (x->size - x->count) * sizeof(uint32_t));
+	}
+	if (y->size < x->size) {
+		y->size = x->size;
+		y->number = (uint32_t*)realloc(y->number, y->size * sizeof(uint32_t));
+		memset(y->number + y->count, 0, (y->size - y->count) * sizeof(uint32_t));
+	}
+	if (x->count < y->count) {
+		x->count = y->count;
+	}
+} 
 
-void print_bigint(BigInt *x);
-void free_bigint(BigInt *x);
+static void _clr_count_bigint(BigInt *x) {
+	if (x->count == 0) {
+		return;
+	}
+	ssize_t i = x->count-1;
+	for (; i > 0; --i) {
+		if (x->number[i] != 0) {
+			break;
+		}
+	}
+	x->count = i + 1;
+}
+
+extern BigInt* new_bigint(uint8_t *str);
+extern void    free_bigint(BigInt *x);
+
+extern void    add_bigint(BigInt *x, BigInt *y);
+extern void    sub_bigint(BigInt *x, BigInt *y);
+
+extern int8_t  cmp_bigint(BigInt *x, BigInt *y);
+extern void    xchg_bigint(BigInt *x, BigInt *y);
+extern void    print_bigint(BigInt *x);
 
 int main(void) {
-	BigInt *x = new_bigint(999999999999999999);
-	BigInt *y = new_bigint(9999999);
+	BigInt *x = new_bigint("99999999999999999999999999999999999999999999999999999999999999");
+	BigInt *y = new_bigint("1");
 
-	mul_bigint(x, y); // x = x * y
-	cpy_bigint(y, x); // y = x
-	add_bigint(x, y); // x = x + y
-	neg_bigint(x);    // x = -x
-
+	add_bigint(x, y);
 	print_bigint(x);
 
-	free_bigint(x);
 	free_bigint(y);
+	free_bigint(x);
 	return 0;
 }
 
-BigInt *neg_bigint(BigInt *x) {
-	x->sign = -x->sign;
-	return x;
+extern void xchg_bigint(BigInt *x, BigInt *y) {
+	BigInt temp = *x;
+	*x = *y;
+	*y = temp;
 }
 
-void print_bigint(BigInt *x) {
-	_Bool number_is_null = 1;
-	putchar(x->sign == 1 ? '+' : '-');
-	for (ssize_t i = x->size-1; i != -1; --i) {
-		if (x->number[i] == 0 && number_is_null) {
-			continue;
+extern int8_t cmp_bigint(BigInt *x, BigInt *y) {
+	_set_count_bigint(x, y);
+	for (ssize_t i = x->count-1; i != -1; ++i) {
+		if (x->number[i] < y->number[i]) {
+			return -1;
 		}
-		number_is_null = 0;
-		printf("%.9u", x->number[i]);
+		if (x->number[i] > y->number[i]) {
+			return 1;
+		}
 	}
-	if (number_is_null) {
-		printf("0");
+	return 0;
+}
+
+extern void print_bigint(BigInt *x) {
+	if (x->count == 0) {
+		printf("null\n");
+		return;
+	}
+	ssize_t i = 0;
+	for (i = x->count-1; i > 0; --i) {
+		if (x->number[i] != 0) {
+			break;
+		}
+	}
+	printf("%u", x->number[i]);
+	for (--i; i != -1; --i) {
+		printf("%.9u", x->number[i]);
 	}
 	putchar('\n');
 }
 
-BigInt *cpy_bigint(BigInt *x, BigInt *y) {
-	x->sign = y->sign;
-	for (size_t i = 0; i < x->size; ++i) {
-		x->number[i] = y->number[i];
+extern void add_bigint(BigInt *x, BigInt *y) {
+	_set_count_bigint(x, y);
+	uint32_t carry = 0;
+	for (size_t i = 0; i < x->count; ++i) {
+		uint64_t  temp = carry + x->number[i] + y->number[i];
+		x->number[i] = temp % MODULO;
+		carry = (temp >= MODULO) ? 1 : 0;
 	}
-	return x;
+	if (carry) {
+		x->number[x->count] = carry;
+		_inc_count_bigint(x);
+	}
+	_clr_count_bigint(x);
 }
 
-BigInt *mod_bigint(BigInt *x, BigInt *y) {
-	BigInt *null = new_bigint(0);
-	int8_t code = cmp_bigint(y, null);
-
-	if (code == 0 || code == -1) {
-		return x;
-	}
-
-	BigInt *count = new_bigint(0);
-
-	while ((code = cmp_bigint(x, y)) == 1 || code == 0) {
-		sub_bigint(x, y);
-	}
-
-	free_bigint(count);
-	free_bigint(null);
-	return x;
-}
-
-BigInt *div_bigint(BigInt *x, BigInt *y) {
-	BigInt *null = new_bigint(0);
-	int8_t code = cmp_bigint(y, null);
-
-	if (code == 0 || code == -1) {
-		return x;
-	}
-
-	BigInt *one  = new_bigint(1);
-	BigInt *count = new_bigint(0);
-
-	while ((code = cmp_bigint(x, y)) == 1 || code == 0) {
-		sub_bigint(x, y);
-		add_bigint(count, one);
-	}
-
-	xchg_bigint(x, count);
-
-	free_bigint(count);
-	free_bigint(null);
-	free_bigint(one);
-
-	return x;
-}
-
-BigInt *mul_bigint(BigInt *x, BigInt *y) {
-	BigInt *null = new_bigint(0);
-	int8_t code = cmp_bigint(y, null);
-
-	if (code == 0 || code == -1) {
-		return x;
-	}
-
-	BigInt *one  = new_bigint(1);
-	BigInt *cpx  = new_bigint(1);
-
-	cpy_bigint(cpx, x);
-	sub_bigint(y, one);
-
-	while(cmp_bigint(y, null) != 0) {
-		add_bigint(x, cpx);
-		sub_bigint(y, one);
-	}
-
-	free_bigint(null);
-	free_bigint(cpx);
-	free_bigint(one);
-	return x;
-}
-
-int8_t cmps_bigint(BigInt *x, BigInt *y) {
-	if (x->sign == -1 && y->sign == 1) {
-		return -1;
-	}
-	if (x->sign == 1 && y->sign == -1) {
-		return 1;
-	}
-	if (x->sign == -1 && y->sign == -1) {
-		return -cmp_bigint(x, y);
-	}
-	return cmp_bigint(x, y);
-}
-
-int8_t cmp_bigint(BigInt *x, BigInt *y) {
-	for (ssize_t i = x->size-1; i != -1 ; --i) {
-		if (x->number[i] > y->number[i]) {
-			return 1;
-		}
-		if (x->number[i] < y->number[i]) {
-			return -1;
-		}
-	}
-	return 0;
-}
-
-BigInt *xchg_bigint(BigInt *x, BigInt *y) {
-	BigInt *temp = new_bigint(1);
-	cpy_bigint(temp, x);
-	cpy_bigint(x, y);
-	cpy_bigint(y, temp);
-	free_bigint(temp);
-	return x;
-}
-
-BigInt *sub_bigint(BigInt *x, BigInt *y) {
-	if (x->sign == -1 && y->sign == 1) {
-		x->sign = 1;
-		add_bigint(x, y);
-		x->sign = -1;
-		return x;
-	}
-
-	if (x->sign == 1 && y->sign == -1) {
-		y->sign = 1;
-		add_bigint(x, y);
-		return x;
-	}
-
+extern void sub_bigint(BigInt *x, BigInt *y) {
 	if (cmp_bigint(x, y) == -1) {
 		xchg_bigint(x, y);
 		sub_bigint(x, y);
-		neg_bigint(x);
-		return x;
+		return;
 	}
-
-	uint32_t length = MAX(x->len, y->len);
-	uint32_t carry_flag = 0;
+	_set_count_bigint(x, y);
 	uint32_t carry = 0;
-
-	for (size_t i = 0; i < length; ++i) {
-		uint64_t temp = (carry + MODULO + x->number[i]) - ((y->number[i] + carry_flag) % MODULO);
-		if (temp >= MODULO) {
-			temp = temp % MODULO;
-			carry += temp / MODULO;
-			carry_flag = 0;
-		} else {
-			carry_flag = 1;
-		}
+	uint64_t temp = 0;
+	for (size_t i = 0; i < x->count; ++i) {
+		temp = (MODULO + x->number[i]) - (carry + y->number[i]);
 		x->number[i] = temp % MODULO;
-		carry = temp / MODULO;
+		carry = (temp >= MODULO) ? 0 : 1;
 	}
-
-	if (carry) {
-		x->number[x->len++] = carry;
-		if (x->len == x->size) {
-			x->size *= 2;
-			x->number = (uint32_t*)realloc(x->number, x->size * sizeof(uint32_t));
-			memset(x->number + x->len, 0, (x->size - x->len) * sizeof(uint32_t));
-		}
-	}
-	return x;
+	_clr_count_bigint(x);
 }
 
-BigInt *add_bigint(BigInt *x, BigInt *y) {
-	if (x->sign == -1 && y->sign == 1) {
-		int8_t sign = 1;
-		if (cmp_bigint(x, y) == 1) {
-			sign = -1;
-		}
-		x->sign = 1;
-		sub_bigint(x, y);
-		x->sign = sign;
-		return x;
-	}
-
-	if (x->sign == 1 && y->sign == -1) {
-		y->sign = 1;
-		sub_bigint(x, y);
-		return x;
-	}
-
-	uint32_t length = MAX(x->len, y->len);
-	uint32_t carry = 0;
-	for (size_t i = 0; i < length; ++i) {
-		uint64_t temp = carry + x->number[i] + y->number[i];
-		x->number[i] = temp % MODULO;
-		carry = temp / MODULO;
-	}
-	if (carry) {
-		x->number[x->len++] = carry;
-		if (x->len == x->size) {
-			x->size *= 2;
-			x->number = (uint32_t*)realloc(x->number, x->size * sizeof(uint32_t));
-			memset(x->number + x->len, 0, (x->size - x->len) * sizeof(uint32_t));
-		}
-	}
-	return x;
-}
-
-BigInt *new_bigint(uint64_t x) {
-	BigInt *result = (BigInt*)malloc(sizeof(BigInt));
-	result->sign   = 1;
-	result->size   = SIZE;
-	result->len    = 2;
-	result->number = (uint32_t*)malloc(result->size * sizeof(uint32_t));
-	memset(result->number, 0, result->size * sizeof(uint32_t));
-
-	result->number[0] = (uint32_t)(x % MODULO);
-	result->number[1] = (uint32_t)(x / MODULO);
-
-	uint32_t carry = 0;
-	for (size_t i = 0; i < result->len; ++i) {
-		uint64_t temp = carry + result->number[i];
-		result->number[i] = temp % MODULO;
-		carry = temp / MODULO;
-	}
-
-	if (carry) {
-		result->number[result->len++] = carry;
-	}
-
-	return result;
-}
-
-void free_bigint(BigInt *x) {
+extern void free_bigint(BigInt *x) {
 	free(x->number);
 	free(x);
+}
+
+extern BigInt* new_bigint(uint8_t *str) {
+	const size_t BUFFSIZE = 9;
+
+	BigInt *bigint = (BigInt*)malloc(sizeof(BigInt));
+	bigint->size   = 10;
+	bigint->count  = 0;
+	bigint->number = (uint32_t*)malloc(bigint->size * sizeof(uint32_t));
+
+	size_t  next = 0;
+	size_t  index = 0;
+	size_t  length = strlen(str);
+
+	uint8_t chunck[BUFFSIZE];
+	memset(chunck, 0, BUFFSIZE * sizeof(uint8_t));
+
+	for (ssize_t i = length-1; i != -1; --i) {
+		chunck[index++] = str[i];
+		if (index == BUFFSIZE) {
+			index = 0;
+			_swap(chunck, BUFFSIZE);
+			bigint->number[next++] = atoi(chunck);
+			_inc_count_bigint(bigint);
+		}
+	}
+	if (index != 0) {
+		chunck[index] = '\0';
+		_swap(chunck, index);
+		bigint->number[next++] = atoi(chunck);
+		_inc_count_bigint(bigint);
+	}
+
+	uint32_t carry = 0;
+	for (size_t i = 0; i < bigint->count; ++i) {
+		uint64_t temp = carry + bigint->number[i];
+		bigint->number[i] = temp % MODULO;
+		carry = temp / MODULO;
+	}
+	if (carry) {
+		bigint->number[bigint->count] = carry;
+		_inc_count_bigint(bigint);
+	}
+
+	return bigint;
 }
