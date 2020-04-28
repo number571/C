@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdarg.h>
 
 typedef enum {
@@ -12,7 +12,7 @@ typedef enum {
 
 typedef union {
     int64_t decimal;
-    double  real;
+    double real;
     uint8_t *string;
 } value_list_t;
 
@@ -22,6 +22,7 @@ typedef struct List {
     struct List *next;
 } List;
 
+// List *list = new_list("drs", 555, 1.23, "hello, world!");
 extern List *new_list(uint8_t *format, ...);
 extern void free_list(List *list);
 
@@ -30,42 +31,47 @@ extern List *pop_list(List *list);
 
 extern void print_list(List *list);
 
-// extern List *delbyi_list(List *list, size_t index);
-// extern List *addbyi_list(List *list, size_t index, uint8_t *format, ...);
+// extern List *delbyid_list(List *list, size_t index);
+// extern List *addbyid_list(List *list, size_t index, uint8_t *format, ...);
 // extern _Bool elemin_list(List *list, uint8_t *format, ...);
 
 int main(void) {
-    List *temp;
-    List *list = new_list("");
+    List *list = new_list("drs", 555, 1.23, "hello, world!");
+    List *temp = push_list(list, "d", 571);
 
-    temp = push_list(list, "d", 571);
-    temp = push_list(temp, "s", "hello, world!");
-    temp = push_list(temp, "r", 6.666);
-
+    temp = push_list(temp, "ddd", 1, 2, 3);
     print_list(list);
+
+    for (size_t i = 0; i < 5; ++i) {
+        temp = pop_list(list);
+        print_list(temp);
+        free(temp);
+    }
+    
     free_list(list);
+
     return 0;
 }
 
 extern List *new_list(uint8_t *format, ...) {
-    List *list     = (List*)malloc(sizeof(List));
+    List *list = (List*)malloc(sizeof(List));
     List *list_ptr = list;
-    list->type     = _INIT_ELEM;
-    list->next     = NULL;
+    list->type = _INIT_ELEM;
+    list->next = NULL;
     value_list_t value;
     va_list factor;
     va_start(factor, format);
     while(*format) {
         switch(*format) {
-            case 'd': case 'i':
+            case 'd': case 'i': // decimal
                 value.decimal = va_arg(factor, int64_t);
                 list_ptr = push_list(list_ptr, "d", value.decimal);
                 break;
-            case 'r': case 'f':
+            case 'r': case 'f': // real
                 value.real = va_arg(factor, double);
                 list_ptr = push_list(list_ptr, "r", value.real);
                 break;
-            case 's':
+            case 's': // string
                 value.string = va_arg(factor, uint8_t*);
                 list_ptr = push_list(list_ptr, "s", value.string);
                 break;
@@ -81,15 +87,15 @@ extern List *push_list(List *list, uint8_t *format, ...) {
         fprintf(stderr, "%s\n", "list is null");
         return NULL;
     }
-    while(list->next != NULL) {
-        ++list;
+    while (list->next != NULL) {
+        list = list->next;
     }
     value_list_t value;
     va_list factor;
     va_start(factor, format);
     while(*format) {
         switch(*format) {
-            case 'd': case 'i':
+            case 'd': case 'i': // decimal
                 value.decimal = va_arg(factor, int64_t);
                 list->next = (List*)malloc(sizeof(List));
                 list = list->next;
@@ -97,7 +103,7 @@ extern List *push_list(List *list, uint8_t *format, ...) {
                 list->value.decimal = value.decimal;
                 list->next = NULL;
                 break;
-            case 'r': case 'f':
+            case 'r': case 'f': // real
                 value.real = va_arg(factor, double);
                 list->next = (List*)malloc(sizeof(List));
                 list = list->next;
@@ -105,7 +111,7 @@ extern List *push_list(List *list, uint8_t *format, ...) {
                 list->value.real = value.real;
                 list->next = NULL;
                 break;
-            case 's':
+            case 's': // string
                 value.string = va_arg(factor, uint8_t*);
                 list->next = (List*)malloc(sizeof(List));
                 list = list->next;
@@ -140,8 +146,8 @@ extern List *pop_list(List *list) {
 
 extern void print_list(List *list) {
     printf("[ ");
-    while(list != NULL) {
-        switch(list->type) {
+    while (list != NULL) {
+        switch (list->type) {
             case _DECIMAL_ELEM:
                 printf("%d ", list->value.decimal);
                 break;
@@ -159,7 +165,7 @@ extern void print_list(List *list) {
 
 extern void free_list(List *list) {
     List *list_ptr;
-    while(list != NULL) {
+    while (list != NULL) {
         list_ptr = list->next;
         free(list);
         list = list_ptr;
