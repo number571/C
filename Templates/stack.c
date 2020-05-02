@@ -1,35 +1,59 @@
 #include <stdio.h>
-#define LIMIT 255
+#include <stdlib.h>
+#include <stdint.h>
 
-double buffer[LIMIT];
-unsigned char count = 0;
+typedef struct Stack {
+    uint32_t *buffer;
+    size_t pointer;
+    size_t size;
+} Stack;
 
-void push (double num);
-double pop (void);
+extern Stack *new_stack(size_t size);
+extern void free_stack(Stack *stack);
 
-int main (void) {
-    push(3);
-    push(7);
-    push(9);
+extern void push_stack(Stack *stack, uint32_t value);
+extern int32_t pop_stack(Stack *stack);
 
-    printf("%lf\n", pop());
-    printf("%lf\n", pop());
-    printf("%lf\n", pop());
+int main(void) {
+    Stack *stack = new_stack(512);
+
+    push_stack(stack, 5);
+    push_stack(stack, 10);
+    push_stack(stack, 20);
+
+    printf("%d\n", pop_stack(stack));
+    printf("%d\n", pop_stack(stack));
+    printf("%d\n", pop_stack(stack));
+
+    free_stack(stack);
     return 0;
 }
 
-void push (double num) {
-    if (count != LIMIT)
-        buffer[count++] = num;
-    else
-        printf("Buffer is full\n");
+extern Stack *new_stack(size_t size) {
+    Stack *stack = (Stack*)malloc(sizeof(Stack));
+    stack->buffer = (uint32_t*)malloc(size * sizeof(uint32_t));
+    stack->pointer = 0;
+    stack->size = size;
+    return stack;
+};
+
+extern void push_stack(Stack *stack, uint32_t value) {
+    if (stack->pointer == stack->size) {
+        fprintf(stderr, "%s\n", "stack overflow");
+        return;
+    }
+    stack->buffer[stack->pointer++] = value;
 }
 
-double pop (void) {
-    if (count != 0)
-        return buffer[--count];
-    else {
-        printf("Buffer is void\n");
-        return 0.0
+extern int32_t pop_stack(Stack *stack) {
+    if (stack->pointer == 0) {
+        fprintf(stderr, "%s\n", "stack overflow");
+        return -1;
     }
+    return stack->buffer[--stack->pointer];
+}
+
+extern void free_stack(Stack *stack) {
+    free(stack->buffer);
+    free(stack);
 }
