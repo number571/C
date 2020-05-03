@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MODULO 64
+
 typedef struct LFSR {
     uint64_t *blocks;
     uint64_t *ibits;
@@ -19,6 +21,20 @@ static _Bool _xor_bits(LFSR *lfsr);
 static void _print_bits(uint64_t x, register uint64_t Nbit);
 
 int main(void) {
+    // uint64_t ibits[] = {
+    //     0b1010000000000000000000000000000000000000000000000000000000000000,
+    // };
+    // LFSR *lfsr = new_LFSR(3, ibits);
+
+    // _print_bits(lfsr->blocks[0], 64);
+    // for (size_t i = 0; i < 8; ++i) {
+    //     printf("%d", gamma_LFSR(lfsr));
+    // }
+    // putchar('\n');
+    // _print_bits(lfsr->blocks[0], 64);
+
+    // free_LFSR(lfsr);
+
     uint64_t ibits1[] = {
         0b1011000000000000000000000000000000000000000000000000000000000001,
     };
@@ -50,15 +66,15 @@ int main(void) {
 extern LFSR *new_LFSR(size_t size, uint64_t *ibits) {
     LFSR *lfsr = (LFSR*)malloc(sizeof(LFSR));
     lfsr->size = size;
-    lfsr->count = (size / 64) + (size % 64 == 0 ? 0 : 1);
+    lfsr->count = (size / MODULO) + (size % MODULO == 0 ? 0 : 1);
 
     lfsr->blocks = (uint64_t*)malloc(lfsr->count * sizeof(uint64_t));
     for (size_t i = 0; i < lfsr->count; ++i) {
-        lfsr->blocks[i] = 1;
+        lfsr->blocks[i] = 0b0100000000000000000000000000000000000000000000000000000000000000;
     }
 
-    if (lfsr->size % 64 != 0) {
-        lfsr->blocks[lfsr->count-1] >>= 64 - (lfsr->size % 64);
+    if (lfsr->size % MODULO != 0) {
+        lfsr->blocks[lfsr->count-1] >>= MODULO - (lfsr->size % MODULO);
     }
 
     lfsr->ibits = (uint64_t*)malloc(lfsr->count * sizeof(uint64_t));
@@ -66,8 +82,8 @@ extern LFSR *new_LFSR(size_t size, uint64_t *ibits) {
         lfsr->ibits[i] = ibits[i];
     }
 
-    if (lfsr->size % 64 != 0) {
-        lfsr->ibits[lfsr->count-1] >>= 64 - (lfsr->size % 64);
+    if (lfsr->size % MODULO != 0) {
+        lfsr->ibits[lfsr->count-1] >>= MODULO - (lfsr->size % MODULO);
     }
 
     return lfsr;
@@ -84,26 +100,31 @@ extern _Bool gamma_LFSR(LFSR *lfsr) {
     _Bool new_bit = _xor_bits(lfsr);
     _Bool carry = 0;
     _Bool temp = 0;
-    uint64_t Nbit = 64;
+    uint64_t Nbit = MODULO;
     for (size_t i = 0; i < lfsr->count; ++i) {
-        if (i == lfsr->count-1 && lfsr->size % 64 != 0) {
-            Nbit = lfsr->size % 64;
+        if (i == lfsr->count-1 && lfsr->size % MODULO != 0) {
+            Nbit = lfsr->size % MODULO;
         }
         temp = lfsr->blocks[i] & 0x01;
         lfsr->blocks[i] >>= 1;
         lfsr->blocks[i] |= (uint64_t)carry << (Nbit-1);
         carry = temp;
     }
-    lfsr->blocks[0] |= (uint64_t)new_bit << 63;
+    if (lfsr->size < MODULO) {
+        lfsr->blocks[0] |= (uint64_t)new_bit << (lfsr->size-1);
+    } else {
+        lfsr->blocks[0] |= (uint64_t)new_bit << (MODULO-1);
+    }
+    
     return gamma_bit;
 }
 
 static _Bool _xor_bits(LFSR *lfsr) {
     _Bool result = 0;
     for (size_t i = 0; i < lfsr->count; ++i) {
-        uint64_t Nbit = 64;
-        if (i == lfsr->count-1 && lfsr->size % 64 != 0) {
-            Nbit = lfsr->size % 64;
+        uint64_t Nbit = MODULO;
+        if (i == lfsr->count-1 && lfsr->size % MODULO != 0) {
+            Nbit = lfsr->size % MODULO;
         }
         for (Nbit = (uint64_t)1 << (Nbit - 1); Nbit > 0x00; Nbit >>= 1) {
             if (lfsr->ibits[i] & Nbit) {
