@@ -63,9 +63,8 @@ int main(void) {
 
     set_tree(tree, decimal(50), string("A"));
     set_tree(tree, decimal(40), string("B"));
-    // set_tree(tree, decimal(60), string("C"));
 
-    del_tree(tree, decimal(50));
+    del_tree(tree, decimal(40));
 
     int64_t x = 15;
     if (in_tree(tree, decimal(x))) {
@@ -262,28 +261,22 @@ static tree_node *_del1_tree(Tree *tree, vtype_tree_t tkey, void *key) {
     return NULL;
 }
 
-static void _del2_tree(Tree *tree) {
-    tree_node *node = tree->node;
+static void _del2_tree(Tree *tree, tree_node *node) {
     tree_node *parent = node->parent;
+    tree_node *temp;
     if (node->right != NULL) {
-        if (parent == NULL) {
-            tree->node = node->right;
-        } else if (parent->left == node) {
-            parent->left = node->right;
-        } else {
-            parent->right = node->right;
-        }
-        node->right->parent = parent;
+        temp = node->right;
     } else {
-        if (parent == NULL) {
-            tree->node = node->left;
-        } else if (parent->left == node) {
-            parent->left = node->left;
-        } else {
-            parent->right = node->left;
-        }
-        node->left->parent = parent;
+        temp = node->left;
     }
+    if (parent == NULL) {
+        tree->node = temp;
+    } else if (parent->left == node) {
+        parent->left = temp;
+    } else {
+        parent->right = temp;
+    }
+    temp->parent = parent;
     free(node);
 }
 
@@ -312,7 +305,7 @@ extern void del_tree(Tree *tree, void *key) {
         _del3_tree(node);
         return;
     }
-    _del2_tree(tree);
+    _del2_tree(tree, node);
     return;
 }
 
