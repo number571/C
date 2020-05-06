@@ -57,6 +57,9 @@ static void _print_tree_as_list(tree_node *node, vtype_tree_t tkey, vtype_tree_t
 static void _print_tree(tree_node *node, vtype_tree_t tkey, vtype_tree_t tvalue);
 static void _print_tree_elem(tree_node *node, vtype_tree_t tkey, vtype_tree_t tvalue);
 static tree_node *_get_tree(tree_node *node, vtype_tree_t tkey, void *key);
+static tree_node *_del1_tree(Tree *tree, vtype_tree_t tkey, void *key);
+static void _del2_tree(Tree *tree, tree_node *node);
+static void _del3_tree(tree_node *node);
 
 int main(void) {
     Tree *tree = new_tree(DECIMAL_ELEM, STRING_ELEM);
