@@ -76,6 +76,10 @@ int main(void) {
     return 0;
 }
 
+/* ============ */
+/* EXTERN BEGIN */
+/* ============ */
+
 extern void *decimal(int64_t x) {
     return (void*)x;
 }
@@ -111,6 +115,61 @@ extern Tree *new_tree(vtype_tree_t key, vtype_tree_t value) {
     tree->node = NULL;
     return tree;
 }
+
+extern void free_tree(Tree *tree) {
+    _free_tree(tree->node);
+    free(tree);
+}
+
+extern _Bool in_tree(Tree *tree, void *key) {
+    return _get_tree(tree->node, tree->type.key, key) != NULL;
+}
+
+extern value_tree_t get_tree(Tree *tree, void *key) {
+    tree_node *node = _get_tree(tree->node, tree->type.key, key);
+    if (node == NULL) {
+        fprintf(stderr, "%s\n", "value undefined");
+        value_tree_t none;
+        return none;
+    }
+    return node->data.value;
+}
+
+extern void set_tree(Tree *tree, void *key, void *value) {
+    if (tree->node == NULL) {
+        tree->node = _new_node(tree->type.key, tree->type.value, key, value);
+        return;
+    }
+    _set_tree(tree->node, tree->type.key, tree->type.value, key, value);
+}
+
+extern void del_tree(Tree *tree, void *key) {
+    tree_node *node = _del1_tree(tree, tree->type.key, key);
+    if (node == NULL) {
+        return;
+    }
+    if (node->left != NULL && node->right != NULL) {
+        _del3_tree(node);
+        return;
+    }
+    _del2_tree(tree, node);
+    return;
+}
+
+extern void print_tree_as_list(Tree *tree) {
+    putchar('[');
+    _print_tree_as_list(tree->node, tree->type.key, tree->type.value);
+    printf("]\n");
+}
+
+extern void print_tree(Tree *tree) {
+    _print_tree(tree->node, tree->type.key, tree->type.value);
+    putchar('\n');
+}
+
+/* ============ */
+/* STATIC BEGIN */
+/* ============ */
 
 static tree_node *_new_node(vtype_tree_t tkey, vtype_tree_t tvalue, void *key, void *value) {
     tree_node *node = (tree_node*)malloc(sizeof(tree_node));
@@ -218,28 +277,6 @@ static tree_node *_get_tree(tree_node *node, vtype_tree_t tkey, void *key) {
     return node;
 }
 
-extern _Bool in_tree(Tree *tree, void *key) {
-    return _get_tree(tree->node, tree->type.key, key) != NULL;
-}
-
-extern value_tree_t get_tree(Tree *tree, void *key) {
-    tree_node *node = _get_tree(tree->node, tree->type.key, key);
-    if (node == NULL) {
-        fprintf(stderr, "%s\n", "value undefined");
-        value_tree_t none;
-        return none;
-    }
-    return node->data.value;
-}
-
-extern void set_tree(Tree *tree, void *key, void *value) {
-    if (tree->node == NULL) {
-        tree->node = _new_node(tree->type.key, tree->type.value, key, value);
-        return;
-    }
-    _set_tree(tree->node, tree->type.key, tree->type.value, key, value);
-}
-
 static tree_node *_del1_tree(Tree *tree, vtype_tree_t tkey, void *key) {
     tree_node *node = tree->node;
     node =  _get_tree(node, tkey, key);
@@ -296,19 +333,6 @@ static void _del3_tree(tree_node *node) {
     free(ptr);
 }
 
-extern void del_tree(Tree *tree, void *key) {
-    tree_node *node = _del1_tree(tree, tree->type.key, key);
-    if (node == NULL) {
-        return;
-    }
-    if (node->left != NULL && node->right != NULL) {
-        _del3_tree(node);
-        return;
-    }
-    _del2_tree(tree, node);
-    return;
-}
-
 static void _print_tree_elem(tree_node *node, vtype_tree_t tkey, vtype_tree_t tvalue) {
     switch(tkey) {
         case DECIMAL_ELEM:
@@ -354,11 +378,6 @@ static void _print_tree(tree_node *node, vtype_tree_t tkey, vtype_tree_t tvalue)
     putchar(')');
 }
 
-extern void print_tree(Tree *tree) {
-    _print_tree(tree->node, tree->type.key, tree->type.value);
-    putchar('\n');
-}
-
 static void _print_tree_as_list(tree_node *node, vtype_tree_t tkey, vtype_tree_t tvalue) {
     if (node == NULL) {
         return;
@@ -368,12 +387,6 @@ static void _print_tree_as_list(tree_node *node, vtype_tree_t tkey, vtype_tree_t
     _print_tree_as_list(node->right, tkey, tvalue);
 }
 
-extern void print_tree_as_list(Tree *tree) {
-    putchar('[');
-    _print_tree_as_list(tree->node, tree->type.key, tree->type.value);
-    printf("]\n");
-}
-
 static void _free_tree(tree_node *node) {
     if (node == NULL) {
         return;
@@ -381,9 +394,4 @@ static void _free_tree(tree_node *node) {
     _free_tree(node->left);
     _free_tree(node->right);
     free(node);
-}
-
-extern void free_tree(Tree *tree) {
-    _free_tree(tree->node);
-    free(tree);
 }
