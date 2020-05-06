@@ -63,25 +63,16 @@ int main(void) {
 
     set_tree(tree, decimal(50), string("A"));
     set_tree(tree, decimal(40), string("B"));
-    set_tree(tree, decimal(60), string("C"));
+    // set_tree(tree, decimal(60), string("C"));
 
-    set_tree(tree, decimal(30), string("D"));
-    set_tree(tree, decimal(42), string("E"));
-
-    set_tree(tree, decimal(55), string("F"));
-    set_tree(tree, decimal(70), string("G"));
-
-    set_tree(tree, decimal(69), string("H"));
-    set_tree(tree, decimal(71), string("I"));
-
-    del_tree(tree, decimal(60));
+    del_tree(tree, decimal(50));
 
     int64_t x = 15;
     if (in_tree(tree, decimal(x))) {
         printf("%lf\n", get_tree(tree, decimal(x)).real);
     }
 
-    print_tree(tree);
+    print_tree_as_list(tree);
     free_tree(tree);
     return 0;
 }
@@ -250,7 +241,8 @@ extern void set_tree(Tree *tree, void *key, void *value) {
     _set_tree(tree->node, tree->type.key, tree->type.value, key, value);
 }
 
-static tree_node *_del1_tree(tree_node *node, vtype_tree_t tkey, void *key) {
+static tree_node *_del1_tree(Tree *tree, vtype_tree_t tkey, void *key) {
+    tree_node *node = tree->node;
     node =  _get_tree(node, tkey, key);
     if (node == NULL) {
         return NULL;
@@ -259,7 +251,9 @@ static tree_node *_del1_tree(tree_node *node, vtype_tree_t tkey, void *key) {
         return node;
     }
     tree_node *parent = node->parent;
-    if (parent->left == node) {
+    if (parent == NULL) {
+        tree->node = NULL;
+    } else if (parent->left == node) {
         parent->left = NULL;
     } else {
         parent->right = NULL;
@@ -268,17 +262,22 @@ static tree_node *_del1_tree(tree_node *node, vtype_tree_t tkey, void *key) {
     return NULL;
 }
 
-static void _del2_tree(tree_node *node) {
+static void _del2_tree(Tree *tree) {
+    tree_node *node = tree->node;
     tree_node *parent = node->parent;
     if (node->right != NULL) {
-        if (parent->left == node) {
+        if (parent == NULL) {
+            tree->node = node->right;
+        } else if (parent->left == node) {
             parent->left = node->right;
         } else {
             parent->right = node->right;
         }
         node->right->parent = parent;
     } else {
-        if (parent->left == node) {
+        if (parent == NULL) {
+            tree->node = node->left;
+        } else if (parent->left == node) {
             parent->left = node->left;
         } else {
             parent->right = node->left;
@@ -305,7 +304,7 @@ static void _del3_tree(tree_node *node) {
 }
 
 extern void del_tree(Tree *tree, void *key) {
-    tree_node *node = _del1_tree(tree->node, tree->type.key, key);
+    tree_node *node = _del1_tree(tree, tree->type.key, key);
     if (node == NULL) {
         return;
     }
@@ -313,7 +312,7 @@ extern void del_tree(Tree *tree, void *key) {
         _del3_tree(node);
         return;
     }
-    _del2_tree(node);
+    _del2_tree(tree);
     return;
 }
 
