@@ -1,22 +1,8 @@
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include "tree.h"
-
-// extern Tree *new_tree(vtype_tree_t key, vtype_tree_t value);
-// extern void free_tree(Tree *tree);
-
-// extern value_tree_t get_tree(Tree *tree, void *key);
-// extern void set_tree(Tree *tree, void *key, void *value);
-// extern void del_tree(Tree *tree, void *key);
-// extern _Bool in_tree(Tree *tree, void *key);
-
-// extern void *decimal(int64_t x);
-// extern void *string(uint8_t *x);
-// extern void *real(double x);
-
-// extern void print_tree(Tree *tree);
-// extern void print_tree_as_list(Tree *tree);
 
 static tree_node *_new_node(vtype_tree_t tkey, vtype_tree_t tvalue, void *key, void *value);
 static void _set_tree(tree_node *node, vtype_tree_t tkey, vtype_tree_t tvalue, void *key, void *value);
