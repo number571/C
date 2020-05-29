@@ -64,8 +64,7 @@ extern String *new_string(uint8_t *str) {
     _str_hash_len(str, &string->hash, &string->len);
     string->cap = (CAPMEM + string->len) << 1;
     string->chars = (uint8_t*)malloc(string->cap * sizeof(uint8_t));
-    memset(string->chars, 0, string->cap * sizeof(uint8_t));
-    strcpy(string->chars, str);
+    memcpy(string->chars, str, string->len);
     return string;
 }
 
@@ -91,11 +90,27 @@ extern void cpy_in_string(String *x, uint8_t *y) {
     }
     x->len = length;
     x->hash = hash;
-    strcpy(x->chars, y);
+    memcpy(x->chars, y, length);
 }
 
 extern int8_t cmp_in_string(String *x, uint8_t *y) {
-    return strcmp(x->chars, y);
+    for (size_t i = 0; i < x->len; ++i) {
+        if (x->chars[i] > y[i] || y[i] == '\0') {
+            return 1;
+        }
+        if (x->chars[i] < y[i]) {
+            return -1;
+        }
+    }
+    return 0;
+}
+
+extern void cat_out_string(uint8_t *x, String *y) {
+    strncat(x, y->chars, y->len);
+}
+
+extern void cpy_out_string(uint8_t *x, String *y) {
+    strncpy(x, y->chars, y->len);
 }
 
 extern int8_t catn_out_string(uint8_t *x, String *y, size_t begin, size_t quan) {
@@ -119,14 +134,6 @@ extern int8_t cpyn_out_string(uint8_t *x, String *y, size_t begin, size_t quan) 
     strncpy(x, y->chars + begin, quan);
 }
 
-extern void cat_out_string(uint8_t *x, String *y) {
-    strncat(x, y->chars, y->len);
-}
-
-extern void cpy_out_string(uint8_t *x, String *y) {
-    strncpy(x, y->chars, y->len);
-}
-
 extern void cat_string(String *x, String *y) {
     size_t new_len = x->len + y->len;
     if (new_len >= x->cap) {
@@ -145,7 +152,7 @@ extern void cpy_string(String *x, String *y) {
     }
     x->len = y->len;
     x->hash = y->hash;
-    strcpy(x->chars, y->chars);
+    memcpy(x->chars, y->chars, x->len);
 }
 
 extern int8_t catn_string(String *x, String *y, size_t begin, size_t quan) {
@@ -196,7 +203,15 @@ extern int8_t cmp_string(String *x, String *y) {
     if (x->hash != y->hash) {
         return -3;
     }
-    return strcmp(x->chars, y->chars);
+    for (size_t i = 0; i < x->len; ++i) {
+        if (x->chars[i] > y->chars[i]) {
+            return 1;
+        }
+        if (x->chars[i] < y->chars[i]) {
+            return -1;
+        }
+    }
+    return 0;
 }
 
 extern size_t sizeof_string(void) {
@@ -224,11 +239,14 @@ extern uint8_t get_string(String *string, size_t index) {
 }
 
 extern void print_string(String *string) {
-    printf("%s", string->chars);
+    for (size_t i = 0; i < string->len; ++i) {
+        putchar(string->chars[i]);
+    }
 }
 
 extern void println_string(String *string) {
-    printf("%s\n", string->chars);
+    print_string(string);
+    putchar('\n');
 }
 
 extern void free_string(String *string) {
@@ -239,7 +257,6 @@ extern void free_string(String *string) {
 static void _realloc_string(String *string, size_t length) {
     string->cap = length << 1;
     string->chars = (uint8_t*)realloc(string->chars, string->cap * sizeof(uint8_t));
-    memset(string->chars + string->len, 0, (string->cap - string->len) * sizeof(uint8_t));
 }
 
 static void _str_hash_len(uint8_t *str, uint32_t *hash, size_t *index) {
