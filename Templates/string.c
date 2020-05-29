@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#define CONST_HASH 31
+
 typedef struct String {
 	uint8_t *chars;
 	uint32_t hash;
@@ -22,6 +24,9 @@ extern int8_t cmp_string(String *x, String *y);
 extern void cat_out_string(uint8_t *x, String *y);
 extern void cpy_out_string(uint8_t *x, String *y);
 
+extern int8_t catn_out_string(uint8_t *x, String *y, size_t begin, size_t quan);
+extern int8_t cpyn_out_string(uint8_t *x, String *y, size_t begin, size_t quan);
+
 extern void cat_in_string(String *x, uint8_t *y);
 extern void cpy_in_string(String *x, uint8_t *y);
 extern int8_t cmp_in_string(String *x, uint8_t *y);
@@ -38,10 +43,13 @@ static void _realloc_string(String *string, size_t length);
 static void _str_hash_len(uint8_t *str, uint32_t *hash, size_t *index);
 
 int main(void) {
-	String *x = new_string("hello, ");
-	cat_in_string(x, "world!");
+	uint8_t array[6];
+	String *x = new_string("hello, world!");
+	cpyn_out_string(array, x, 7, 5);
 
 	println_string(x);
+	printf("%s\n", array);
+
 	free_string(x);
 	return 0;
 }
@@ -63,7 +71,7 @@ extern void cat_in_string(String *x, uint8_t *y) {
 		_realloc_string(x, new_len);
 	}
 	for (size_t i = 0, j = x->len; i < y_len; ++i, ++j) {
-        x->hash = y[i] + 31 * x->hash;
+        x->hash = y[i] + CONST_HASH * x->hash;
     	x->chars[j] = y[i];
     }
     x->len = new_len;
@@ -85,6 +93,27 @@ extern int8_t cmp_in_string(String *x, uint8_t *y) {
 	return strcmp(x->chars, y);
 }
 
+extern int8_t catn_out_string(uint8_t *x, String *y, size_t begin, size_t quan) {
+	if (begin > y->len) {
+		return 1;
+	} 
+	if (begin + quan > y->len) {
+		return 2;
+	}
+	strncat(x, y->chars + begin, quan);
+	return 0;
+}
+
+extern int8_t cpyn_out_string(uint8_t *x, String *y, size_t begin, size_t quan) {
+	if (begin > y->len) {
+		return 1;
+	} 
+	if (begin + quan > y->len) {
+		return 2;
+	}
+	strncpy(x, y->chars + begin, quan);
+}
+
 extern void cat_out_string(uint8_t *x, String *y) {
 	strncat(x, y->chars, y->len);
 }
@@ -99,7 +128,7 @@ extern void cat_string(String *x, String *y) {
 		_realloc_string(x, new_len);
 	}
 	for (size_t i = 0, j = x->len; i < y->len; ++i, ++j) {
-        x->hash = y->chars[i] + 31 * x->hash;
+        x->hash = y->chars[i] + CONST_HASH * x->hash;
     	x->chars[j] = y->chars[i];
     }
     x->len = new_len;
@@ -169,6 +198,6 @@ static void _realloc_string(String *string, size_t length) {
 
 static void _str_hash_len(uint8_t *str, uint32_t *hash, size_t *index) {
 	for (; str[*index]; ++*index) {
-        *hash = str[*index] + 31 * *hash;
+        *hash = str[*index] + CONST_HASH * *hash;
     }
 }
