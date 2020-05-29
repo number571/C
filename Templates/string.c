@@ -46,11 +46,15 @@ static void _str_hash_len(uint8_t *str, uint32_t *hash, size_t *index);
 int main(void) {
     String *x = new_string("hello, world!");
     String *y = new_string("");
-    
+
     cpyn_string(y, x, 7, 5);
+    catn_string(x, x, 6, 6);
 
     println_string(y);
+    println_string(x);
+
     free_string(x);
+    free_string(y);
     return 0;
 }
 
