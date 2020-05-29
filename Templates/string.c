@@ -47,17 +47,9 @@ static void _realloc_string(String *string, size_t length);
 static void _str_hash_len(uint8_t *str, uint32_t *hash, size_t *index);
 
 int main(void) {
-    String *x = new_string("hello, world!");
-    String *y = new_string("");
-
-    cpyn_string(y, x, 7, 5);
-    catn_string(x, x, 6, 6);
-
-    println_string(y);
-    println_string(x);
-
+    String *x = new_string("hello");
+    printf("%d\n", cmp_in_string(x, "hello"));
     free_string(x);
-    free_string(y);
     return 0;
 }
 
@@ -132,13 +124,20 @@ extern int8_t cpyn_in_string(String *x, uint8_t *y, size_t quan) {
 }
 
 extern int8_t cmp_in_string(String *x, uint8_t *y) {
-    for (size_t i = 0; i < x->len; ++i) {
-        if (x->chars[i] > y[i] || y[i] == '\0') {
+    size_t i = 0;
+    for (; i < x->len; ++i) {
+        if (y[i] == '\0') {
+            return -1;
+        }
+        if (x->chars[i] > y[i]) {
             return 1;
         }
         if (x->chars[i] < y[i]) {
             return -1;
         }
+    }
+    if (y[i] != '\0') {
+        return -1;
     }
     return 0;
 }
