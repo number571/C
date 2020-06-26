@@ -1,5 +1,9 @@
 CC=gcc
 LN=ld
+
+# CC=i686-w64-mingw32-gcc
+# LN=ld -m i386pe
+
 CFLAGS=-Wall -std=c99
 
 HEADERS=http.h net.h hashtab.h tree.h type.h
