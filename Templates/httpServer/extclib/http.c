@@ -161,7 +161,7 @@ static int8_t _switch_http(HTTP *http, int conn, HTTPreq *request) {
 			return 1;
 		}
 		index -= 1;
-		buffer[index] = '\0';
+// 		buffer[index] = '\0';
 		for (; index > 0 && buffer[index] != '/'; --index) {
 			buffer[index] = '\0';
 		}
