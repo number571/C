@@ -30,7 +30,7 @@ static int8_t _parse_address(char *address, char *ipv4, char *port);
 // 127.0.0.1:8080
 extern int listen_net(char *address) {
 #ifdef __WIN32
-	WSDATA wsa;
+	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2,2), &wsa) != 0) {
 		return WINSOCK_ERR;
 	}
@@ -66,7 +66,7 @@ extern int accept_net(int listener) {
 
 extern int connect_net(char *address) {
 #ifdef __WIN32
-	WSDATA wsa;
+	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2,2), &wsa) != 0) {
 		return WINSOCK_ERR;
 	}
