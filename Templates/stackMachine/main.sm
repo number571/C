@@ -1,7 +1,7 @@
 ; Factorial
 
 ; A
-push 100000
+push 1000
 
 ; B <- A
 load $0
@@ -26,15 +26,8 @@ push 1
 load $1
 jg fact
 
-; stack size
-stack
-print
-pop
-
-; results
-
 ; B
 pop
 
 ; A
-pop 
+pop

@@ -8,15 +8,15 @@
 #include "extclib/hashtab.h"
 #include "extclib/stack.h"
 
-#define OPERATION_NUM 19
+#define OPERATION_NUM 15
 
 /*
 ; Operators:
 ; 1. push, pop
 ; 2. add, sub, mul, div
-; 3. jmp, je, jne, jl, jle, jg, jge
+; 3. jmp, je, jne, jl, jg
 ; 4. load, store
-; 5. label, stack
+; 5. label
 */
 
 typedef enum opcode_t {
@@ -25,9 +25,7 @@ typedef enum opcode_t {
     LABEL_CODE,
     JMP_CODE,
     JL_CODE,
-    JLE_CODE,
     JG_CODE,
-    JGE_CODE,
     JE_CODE,
     JNE_CODE,
     ADD_CODE,
@@ -36,8 +34,6 @@ typedef enum opcode_t {
     DIV_CODE,
     STORE_CODE,
     LOAD_CODE,
-    STACK_CODE,
-    PRINT_CODE,
     COMMENT_CODE,
     PASS_CODE, // code undefined
 } opcode_t;
@@ -46,11 +42,9 @@ const char *codes[OPERATION_NUM] = {
     [PUSH_CODE]     = "push",
     [POP_CODE]      = "pop",
     [LABEL_CODE]    = "label",
-    [JMP_CODE]      = "jump",
+    [JMP_CODE]      = "jmp",
     [JL_CODE]       = "jl",
-    [JLE_CODE]      = "jle",
     [JG_CODE]       = "jg",
-    [JGE_CODE]      = "jge",
     [JE_CODE]       = "je",
     [JNE_CODE]      = "jne",
     [ADD_CODE]      = "add",
@@ -59,8 +53,6 @@ const char *codes[OPERATION_NUM] = {
     [DIV_CODE]      = "div",
     [STORE_CODE]    = "store",
     [LOAD_CODE]     = "load",
-    [STACK_CODE]    = "stack",
-    [PRINT_CODE]    = "print",
     [COMMENT_CODE]  = ";",
 };
 
@@ -72,12 +64,9 @@ static _Bool _strnull(char *str);
 static _Bool _isspace(char ch);
 
 int main(int argc, char const *argv[]) {
-    if (argc < 2) {
-        return 1;
-    }
     BigInt *res = open_sm(argv[1]);
     if (res == NULL) {
-        return 2;
+        return 1;
     }
     println_bigint(res);
     free_bigint(res);
@@ -134,18 +123,6 @@ extern BigInt *read_sm(FILE *file) {
     while(fgets(buffer, BUFSIZ, file) != NULL) {
         line = _readcode(buffer, file, &code);
         switch(code) {
-            case STACK_CODE: {
-                BigInt *num = new_bigint("0");
-                cpynum_bigint(num, (uint32_t)size_stack(stack));
-                push_stack(stack, num);
-            }
-            break;
-            case PRINT_CODE: {
-                BigInt *num = pop_stack(stack).bigint;
-                println_bigint(num);
-                push_stack(stack, num);
-            }
-            break;
             case STORE_CODE:
                 if (line[0] == '$') {
                     char *arg = line + strlen(line) + 1;
@@ -167,11 +144,8 @@ extern BigInt *read_sm(FILE *file) {
                         set_stack(stack, index, num);
                         break;
                     }
-                    BigInt *num = new_bigint("0");
-                    cpynum_bigint(num, (int32_t)atoi(arg));
+                    BigInt *num = new_bigint(arg);
                     int32_t index = atoi(line+1);
-                    BigInt *x = get_stack(stack, index).bigint;
-                    free_bigint(x);
                     set_stack(stack, index, num);
                 }
             break;
@@ -182,8 +156,7 @@ extern BigInt *read_sm(FILE *file) {
                 }
             break;
             case PUSH_CODE: {
-                BigInt *num = new_bigint("0");
-                cpynum_bigint(num, (uint32_t)atoi(line));
+                BigInt *num = new_bigint(line);
                 push_stack(stack, num);
             }
             break;
@@ -220,7 +193,7 @@ extern BigInt *read_sm(FILE *file) {
                 fseek(file, index, SEEK_SET);
             }
             break;
-            case JL_CODE: case JLE_CODE: case JG_CODE: case JGE_CODE: case JE_CODE: case JNE_CODE: {
+            case JL_CODE: case JG_CODE: case JE_CODE: case JNE_CODE: {
                 int32_t index = get_hashtab(hashtab, line).decimal;
                 BigInt *x = pop_stack(stack).bigint;
                 BigInt *y = pop_stack(stack).bigint;
@@ -230,18 +203,8 @@ extern BigInt *read_sm(FILE *file) {
                             fseek(file, index, SEEK_SET);
                         }
                     break;
-                    case JLE_CODE:
-                        if (cmp_bigint(x, y) <= 0) {
-                            fseek(file, index, SEEK_SET);
-                        }
-                    break;
                     case JG_CODE:
                         if (cmp_bigint(x, y) > 0) {
-                            fseek(file, index, SEEK_SET);
-                        }
-                    break;
-                    case JGE_CODE:
-                        if (cmp_bigint(x, y) >= 0) {
                             fseek(file, index, SEEK_SET);
                         }
                     break;
@@ -297,8 +260,6 @@ static char *_readcode(char *line, FILE *file, opcode_t *code) {
     switch(*code) {
         case PASS_CODE:
         case POP_CODE:
-        case STACK_CODE:
-        case PRINT_CODE:
         case COMMENT_CODE:
         return line;
         default: ;
