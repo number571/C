@@ -18,7 +18,6 @@ int main(void) {
 }
 
 void index_page(int conn, HTTPreq *req) {
-	printf("%s - %s - %s\n", req->method, req->path, req->proto);
 	if(strcmp(req->path, "/") != 0) {
 		parsehtml_http(conn, "page404.html");
 		return;
@@ -27,7 +26,7 @@ void index_page(int conn, HTTPreq *req) {
 }
 
 void about_page(int conn, HTTPreq *req) {
-	if(strcmp(req->path, "/about") != 0) {
+	if(strcmp(req->path, "/about/") != 0) {
 		parsehtml_http(conn, "page404.html");
 		return;
 	}
