@@ -5,7 +5,6 @@
 
 #include "type.h"
 #include "stack.h"
-#include "bigint.h"
 
 typedef struct Stack {
     vtype_t tvalue;
@@ -22,7 +21,6 @@ extern Stack *new_stack(size_t size, vtype_t tvalue) {
         case DECIMAL_TYPE: 
         case REAL_TYPE: 
         case STRING_TYPE:
-        case BIGINT_TYPE:
             break;
         default:
             fprintf(stderr, "%s\n", "tvalue type not supported");
@@ -87,9 +85,6 @@ static void _insert_stack(Stack *stack, size_t index, void *value) {
             case STRING_TYPE:
                 free(stack->buffer[index].string);
             break;
-            case BIGINT_TYPE:
-                free(stack->buffer[index].bigint);
-            break;
             default: ;
         }
     }
@@ -107,9 +102,6 @@ static void _insert_stack(Stack *stack, size_t index, void *value) {
             strcpy(stack->buffer[index].string, (char*)value);
         }
         break;
-        case BIGINT_TYPE: 
-            stack->buffer[index].bigint = (struct BigInt*)value;
-        break;
         default: ;
     }
 }
@@ -119,11 +111,6 @@ static void _free_stack(Stack *stack) {
         case STRING_TYPE:
             for (size_t i = 0; i < stack->index; ++i) {
                 free(stack->buffer[i].string);
-            }
-        break;
-        case BIGINT_TYPE:
-            for (size_t i = 0; i < stack->index; ++i) {
-                free(stack->buffer[i].bigint);
             }
         break;
         default: ;
