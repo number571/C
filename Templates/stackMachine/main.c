@@ -7,7 +7,7 @@
 #include "extclib/hashtab.h"
 #include "extclib/stack.h"
 
-#define OPERATION_NUM 18
+#define OPERATION_NUM 19
 
 typedef enum opcode_t {
     PUSH_CODE,
@@ -28,6 +28,7 @@ typedef enum opcode_t {
     LOAD_CODE,
     STACK_CODE,
     PRINT_CODE,
+    COMMENT_CODE,
     PASS_CODE, // code undefined
 } opcode_t;
 
@@ -50,12 +51,14 @@ const char *codes[OPERATION_NUM] = {
     [LOAD_CODE]     = "load",
     [STACK_CODE]    = "stack",
     [PRINT_CODE]    = "print",
+    [COMMENT_CODE]  = ";",
 };
 
 extern int32_t open_sm(char *filename);
 extern int32_t read_sm(FILE *file);
 
 static char *_readcode(char *line, FILE *file, opcode_t *code);
+static _Bool _strnull(char *str);
 static _Bool _isspace(char ch);
 
 int main(void) {
@@ -78,12 +81,22 @@ extern int32_t open_sm(char *filename) {
 extern int32_t read_sm(FILE *file) {
     HashTab *hashtab = new_hashtab(250, STRING_TYPE, DECIMAL_TYPE);
     char buffer[BUFSIZ] = {0};
+    size_t line_index = 0;
+    _Bool err_exist = 0;
     char *line;
     opcode_t code;
 
-    // read labels
+    // read labels, check syntax
     while(fgets(buffer, BUFSIZ, file) != NULL) {
+        ++line_index;
         line = _readcode(buffer, file, &code);
+        if((code == PASS_CODE && _strnull(line)) || code == COMMENT_CODE) {
+            continue;
+        }
+        if (code == PASS_CODE) {
+            err_exist = 1;
+            fprintf(stderr, "error: line %ld\n", line_index);
+        }
         switch(code) {
             case LABEL_CODE:
                 set_hashtab(hashtab, string(line), decimal((int32_t)ftell(file)));
@@ -91,11 +104,15 @@ extern int32_t read_sm(FILE *file) {
             default: ;
         }
     }
+    if (err_exist) {
+        free_hashtab(hashtab);
+        return -1;
+    }
 
     Stack *stack = new_stack(10000, DECIMAL_TYPE);
     int32_t value = 0;
     fseek(file, 0, SEEK_SET);
-    
+
     // read commands
     while(fgets(buffer, BUFSIZ, file) != NULL) {
         line = _readcode(buffer, file, &code);
@@ -234,6 +251,17 @@ static char *_readcode(char *line, FILE *file, opcode_t *code) {
         }
     }
 
+    // operators without args
+    switch(*code) {
+        case PASS_CODE:
+        case POP_CODE:
+        case STACK_CODE:
+        case PRINT_CODE:
+        case COMMENT_CODE:
+        return line;
+        default: ;
+    }
+
     // pass spaces after operator
     ++ptr;
     while(isspace(*ptr)) {
@@ -249,6 +277,16 @@ static char *_readcode(char *line, FILE *file, opcode_t *code) {
 
     // return first argument
     return line;
+}
+
+static _Bool _strnull(char *str) {
+    while(isspace(*str)) {
+        ++str;
+    }
+    if(*str == '\0') {
+        return 1;
+    }
+    return 0;
 }
 
 static _Bool _isspace(char ch) {
