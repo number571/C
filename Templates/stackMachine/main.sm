@@ -1,0 +1,38 @@
+; Operators:
+; 1. push, pop
+; 2. add, sub, mul, div
+; 3. jmp, je, jne, jl, jle, jg, jge
+; 4. load, store
+; 5. def, stack
+
+push 6		; A
+load $0		; B <- A
+
+label fact
+
+; B <- B - 1
+push 1
+load $1
+sub
+store $1 $2
+pop
+
+; A <- A * B
+load $0
+load $1
+mul
+store $0 $2
+pop
+
+push 1
+load $1
+jg fact
+
+; stack size
+stack
+print
+pop
+
+; results
+pop ; B
+pop ; A
