@@ -1,12 +1,10 @@
-; Operators:
-; 1. push, pop
-; 2. add, sub, mul, div
-; 3. jmp, je, jne, jl, jle, jg, jge
-; 4. load, store
-; 5. def, stack
+; Factorial(6)
 
-push 6		; A
-load $0		; B <- A
+; A
+push 6
+
+; B <- A
+load $0
 
 label fact
 
