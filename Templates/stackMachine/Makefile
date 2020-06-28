@@ -7,6 +7,6 @@ FILES=main.c extclib/extclib.o
 default: build run
 
 build: $(FILES)
-	$(CC) $(CFLAGS) $(FILES) -o main
+	$(CC) $(CFLAGS) $(FILES) -o main -lgmp
 run: main
-	./main
+	./main main.sm

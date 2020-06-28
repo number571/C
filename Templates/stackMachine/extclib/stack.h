@@ -2,6 +2,7 @@
 #define EXTCLIB_STACK_H_
 
 #include <stddef.h>
+#include "type.h"
 
 typedef struct Stack Stack;
 
