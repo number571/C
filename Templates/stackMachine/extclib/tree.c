@@ -55,7 +55,7 @@ extern Tree *new_tree(vtype_t key, vtype_t value) {
     switch(value) {
         case DECIMAL_TYPE: 
         case REAL_TYPE: 
-        case STRING_TYPE: 
+        case STRING_TYPE:
             break;
         default:
             fprintf(stderr, "%s\n", "value type not supported");
@@ -206,8 +206,11 @@ static void _set_key(tree_node *node, vtype_t tkey, void *key) {
         case DECIMAL_TYPE:
             node->data.key.decimal = (int32_t)(intptr_t)key;
         break;
-        case STRING_TYPE:
-            node->data.key.string = (char*)key;
+        case STRING_TYPE: {
+            size_t size = strlen((char*)key);
+            node->data.key.string = (char*)malloc(sizeof(char)*size+1);
+            strcpy(node->data.key.string, (char*)key);
+        }
         break;
         default: ;
     }
@@ -356,8 +359,6 @@ static void _del3_tree(Tree *tree, tree_node *node) {
         parent->right = NULL;
     }
     tree->size -= 1;
-    _free_key_tree(tree->type.key, node);
-    _free_value_tree(tree->type.value, ptr);
     free(ptr);
 }
 
@@ -422,9 +423,19 @@ static void _free_tree(Tree *tree, tree_node *node) {
 }
 
 static void _free_key_tree(vtype_t type, tree_node *node) {
-    // pass
+    switch(type) {
+        case STRING_TYPE:
+            free(node->data.key.string);
+        break;
+        default: ;
+    }
 }
 
 static void _free_value_tree(vtype_t type, tree_node *node) {
-    // pass
+    switch(type) {
+        case STRING_TYPE:
+            free(node->data.value.string);
+        break;
+        default: ;
+    }
 }
