@@ -9,6 +9,15 @@
 
 #define OPERATION_NUM 19
 
+/*
+; Operators:
+; 1. push, pop
+; 2. add, sub, mul, div
+; 3. jmp, je, jne, jl, jle, jg, jge
+; 4. load, store
+; 5. label, stack
+*/
+
 typedef enum opcode_t {
     PUSH_CODE,
     POP_CODE,
