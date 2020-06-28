@@ -9,10 +9,7 @@ extern void *decimal(int32_t x) {
 }
 
 extern void *string(char *x) {
-	size_t size = strlen(x);
-	char *str = (char*)malloc(sizeof(char)*size+1);
-	strcpy(str, x);
-    return (void*)str;
+    return (void*)x;
 }
 
 extern void *real(double x) {
