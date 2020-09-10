@@ -10,6 +10,8 @@ FILES=main.c extclib/extclib.o
 default: build run
 
 build: $(FILES)
-	$(CC) $(CFLAGS) $(FILES) -o main -lws2_32 # add '-lws2_32' if platform 'windows'
+# 	$(CC) $(CFLAGS) $(FILES) -o main
+	$(CC) $(CFLAGS) $(FILES) -o main.exe -lws2_32
 run: main
-	./main
+# 	./main
+	wine main.exe
