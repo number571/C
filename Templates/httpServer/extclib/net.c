@@ -39,9 +39,15 @@ extern int listen_net(char *address) {
 	if (listener < 0) {
 		return SOCKET_ERR;
 	}
+#ifdef __linux__
 	if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
 		return SETOPT_ERR;
 	}
+#else
+	if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &(char){1}, sizeof(char)) < 0) {
+		return SETOPT_ERR;
+	}
+#endif
 	char ipv4[16];
 	char port[6];
 	if (_parse_address(address, ipv4, port) != 0) {

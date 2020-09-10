@@ -1,8 +1,8 @@
-CC=gcc
-LN=ld
+# CC=gcc
+# LN=ld
 
-# CC=i686-w64-mingw32-gcc
-# LN=ld -m i386pe
+CC=i686-w64-mingw32-gcc
+LN=ld -m i386pe
 
 CFLAGS=-Wall -std=c99
 

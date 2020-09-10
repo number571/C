@@ -113,7 +113,7 @@ static HTTPreq _new_request(void) {
 */
 
 static void _parse_request(HTTPreq *request, char *buffer, size_t size) {
-	printf("%s\n", buffer);
+	// printf("%s\n", buffer);
 	for (size_t i = 0; i < size; ++i) {
 		switch(request->state) {
 			case 0:
