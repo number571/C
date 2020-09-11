@@ -30,14 +30,11 @@ int dijkstra(relation_t *rels[RELSIZE], node_t start, node_t finish) {
     for (size_t i = 0; i < RELSIZE; ++i) {
         // enumeration of node relations
         for (size_t j = 0; j < RELSIZE; ++j) {
-            // enumeration another relations to node
-            for (size_t k = 0; k < RELSIZE; ++k) {
-                if (rels[k]->paths[j] != UNKNOWN && !rels[k]->used) {
-                    if (results[j] < results[k] + rels[k]->paths[j]) {
-                        continue;
-                    }
-                    results[j] = results[k] + rels[k]->paths[j];
+            if (rels[i]->paths[j] != UNKNOWN && !rels[i]->used) {
+                if (results[j] < results[i] + rels[i]->paths[j]) {
+                    continue;
                 }
+                results[j] = results[i] + rels[i]->paths[j];
             }
         }
         rels[i]->used = 1;
