@@ -11,16 +11,11 @@ typedef enum node_t {
     A, B, C, D, E, F
 } node_t;
 
-typedef struct relation_t {
-    _Bool used;
-    int paths[RELSIZE];
-} relation_t;
+int *new_relation(int paths[RELSIZE]);
+void init_rels(int *rels[RELSIZE]);
+void free_rels(int *rels[RELSIZE]);
 
-relation_t *new_relation(int paths[RELSIZE]);
-void init_rels(relation_t *rels[RELSIZE]);
-void free_rels(relation_t *rels[RELSIZE]);
-
-int dijkstra(relation_t *rels[RELSIZE], node_t start, node_t finish) {
+int dijkstra(int *rels[RELSIZE], node_t start, node_t finish) {
     int results[RELSIZE] = {0};
     for (size_t i = 0; i < RELSIZE; ++i) {
         results[i] = INFINIT;
@@ -30,35 +25,33 @@ int dijkstra(relation_t *rels[RELSIZE], node_t start, node_t finish) {
     for (size_t i = 0; i < RELSIZE; ++i) {
         // enumeration of node relations
         for (size_t j = 0; j < RELSIZE; ++j) {
-            if (rels[i]->paths[j] != UNKNOWN && !rels[i]->used) {
-                if (results[j] < results[i] + rels[i]->paths[j]) {
+            if (rels[i][j] != UNKNOWN) {
+                if (results[j] < results[i] + rels[i][j]) {
                     continue;
                 }
-                results[j] = results[i] + rels[i]->paths[j];
+                results[j] = results[i] + rels[i][j];
             }
         }
-        rels[i]->used = 1;
     }
     return results[finish];
 }
 
 int main(void) {
-    relation_t *rels[RELSIZE];
+    int *rels[RELSIZE];
     init_rels(rels);
     printf("%d\n", dijkstra(rels, A, E));
     free_rels(rels);
     return 0;
 }
 
-relation_t *new_relation(int paths[RELSIZE]) {
-    relation_t *rel = (relation_t*)malloc(sizeof(relation_t));
-    rel->used = 0;
-    memcpy(rel->paths, paths, RELSIZE*sizeof(int));
+int *new_relation(int paths[RELSIZE]) {
+    int *rel = (int*)malloc(sizeof(int)*RELSIZE);
+    memcpy(rel, paths, sizeof(int)*RELSIZE);
     return rel;
 }
 
 // EXAMPLE FROM: https://ru.wikipedia.org/wiki/%D0%90%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC_%D0%94%D0%B5%D0%B9%D0%BA%D1%81%D1%82%D1%80%D1%8B
-void init_rels(relation_t *rels[RELSIZE]) {
+void init_rels(int *rels[RELSIZE]) {
     rels[A] = new_relation((int[]){
         [A] = SELFNOD,
         [B] = 7,
@@ -114,7 +107,7 @@ void init_rels(relation_t *rels[RELSIZE]) {
     });
 }
 
-void free_rels(relation_t *rels[RELSIZE]) {
+void free_rels(int *rels[RELSIZE]) {
     for (size_t i = 0; i < RELSIZE; ++i) {
         free(rels[i]);
     }
