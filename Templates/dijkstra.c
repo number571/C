@@ -15,16 +15,17 @@ int *new_relation(int paths[RELSIZE]);
 void init_rels(int *rels[RELSIZE]);
 void free_rels(int *rels[RELSIZE]);
 
-int dijkstra(int *rels[RELSIZE], node_t start, node_t finish) {
-    int results[RELSIZE] = {0};
-    for (size_t i = 0; i < RELSIZE; ++i) {
+int dijkstra(int **rels, node_t start, node_t finish, size_t size) {
+    int results[size];
+    memset(results, 0, sizeof(int)*size);
+    for (size_t i = 0; i < size; ++i) {
         results[i] = INFINIT;
     }
     results[start] = 0;
     // enumeration of nodes
-    for (size_t i = 0; i < RELSIZE; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         // enumeration of node relations
-        for (size_t j = 0; j < RELSIZE; ++j) {
+        for (size_t j = 0; j < size; ++j) {
             if (rels[i][j] != UNKNOWN) {
                 if (results[j] < results[i] + rels[i][j]) {
                     continue;
@@ -39,7 +40,7 @@ int dijkstra(int *rels[RELSIZE], node_t start, node_t finish) {
 int main(void) {
     int *rels[RELSIZE];
     init_rels(rels);
-    printf("%d\n", dijkstra(rels, A, E));
+    printf("%d\n", dijkstra(rels, A, E, RELSIZE));
     free_rels(rels);
     return 0;
 }
