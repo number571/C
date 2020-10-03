@@ -1,0 +1,117 @@
+#include <stdio.h>
+
+int main()
+{
+    int arr[5][5],i,j,row,col,choice,s,k;
+    printf("Enter the Number of rows");
+    scanf("%d",&row);
+    printf("Enter the Number of column");
+    scanf("%d",&col);
+    
+    printf("Enter the Array");
+    /*Read the matrices*/
+    for (i=0; i<col;i++)
+     {
+             for (j=0; j<row;j++)
+                {
+                    scanf("%d",&arr[i][j]);
+                }
+     }
+     
+     
+       /*Print the matrices*/
+      for (i=0; i<col;i++)
+     {
+             for (j=0; j<row;j++)
+                {
+                    printf("%d   ",arr[i][j]);
+                     
+                }
+                printf("\n");
+     } 
+     
+     
+     /*Taking input from user*/
+      int new_arr[10][10],new_row,new_col;
+      
+      printf("Enter the number of rows and column of 2nd matrices");
+      scanf("%d %d",&new_row,&new_col);
+        for (i=0; i<new_col;i++)
+           {
+             for (j=0; j<new_row;j++)
+                {
+                    scanf("%d",&new_arr[i][j]);
+                }
+          }
+      
+     /*Decision making*/
+     printf("Enter 1 to addition matrices \n");
+     printf("Enter 2 to substraction matrices \n");
+     printf("Enter 3 to multiplication matrices \n");
+     scanf("%d",&choice);
+     switch(choice)
+     
+       {
+           case 1:
+            /*Code for Addition of matrices*/
+                 if(row!=new_row && col !=new_col)
+                    {
+                        printf("Number of rows and column are not equal");
+                        break;
+                    } 
+                 for (i=0; i<col;i++)
+                    {
+                      for (j=0; j<row;j++)
+                         {
+                          printf("%d   ",arr[i][j]+new_arr[i][j]);
+                     
+                          }
+                   printf("\n");
+                    }  
+           
+           break;
+           case 2:
+            /*Code for substraction of matrices*/
+           if(row!=new_row && col !=new_col)
+                    {
+                        printf("Number of rows and column are not equal");
+                        break;
+                    } 
+                 for (i=0; i<col;i++)
+                    {
+                      for (j=0; j<row;j++)
+                         {
+                          printf("%d   ",arr[i][j]-new_arr[i][j]);
+                     
+                          }
+                   printf("\n");
+                    }  
+           
+           
+           break;
+           case 3:
+           /*Code for Multiplication of matrices*/
+           if(col!=new_row)
+                    {
+                        break;
+                    } 
+                 for (i=0; i<col;i++)
+                    {
+                      for (j=0; j<row;j++)
+                         {
+                          int s = 0;
+				         	for (k = 0; k < col; k++)
+				         	{
+					      	s += arr[i][k]*new_arr[k][j];
+				         	}
+                         }
+                   printf("\n");
+                    }  
+           
+           
+           
+           break;
+           
+       } 
+ 
+}
