@@ -16,7 +16,7 @@ int main (void) {
 }
 
 int rand (void) {
-    next = next * 1103515245 * 12345;
+    next = next * 1103515245 + 12345;
     return (unsigned int) (next / 65536) % 32768;
 }
 
