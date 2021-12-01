@@ -1,101 +1,150 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#define ROTNUM 3
-#define SWTNUM 6
-#define ALPSIZ 26
+#define ALPHABET_SIZE     26
+#define ALPHABET_SORTED   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define ALPHABET_REVERSED "ZYXWVUTSRQPONMLKJIHGFEDCBA"
 
-// A-Z, B-Y, C-X, ...
-static char reflector[ALPSIZ+1] = {
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-};
-// A-F, B-E, C-D, ...
-static char switches[SWTNUM+1] = {
-    "ABCDEF",
-};
-static char rotors[ROTNUM][ALPSIZ+1] = {
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-};
-static int shfrot[ROTNUM] = {
-    1, 2, 3,
-};
+typedef struct rotor_t {
+    int period;
+    char static_part[ALPHABET_SIZE];
+    char dynamic_part[ALPHABET_SIZE];
+} rotor_t;
 
-extern char *encrypt(char *output, const char *input, int size);
-static int find_index(char *rotor, char ch, int size);
-static void shift_rotor(char *rotor, int size);
+typedef struct reflector_t {
+    char input_part[ALPHABET_SIZE];
+    char output_part[ALPHABET_SIZE];
+} reflector_t;
 
-int main(int argc, char const *argv[]) {
+typedef struct enigma_t {
+    int counter;
+    int rotors_num;
+    rotor_t *rotors;
+    reflector_t reflector;
+} enigma_t;
+
+extern enigma_t *enigma_new(reflector_t reflector, rotor_t rotors[], int rotors_num);
+extern void enigma_free(enigma_t *enigma);
+extern char enigma_encrypt(enigma_t *enigma, char ch);
+
+static void shift_right(char array[], int size);
+static int find_index(char array[], int size, char ch);
+
+int main(int argc, char *argv[]) {
     int len;
-    char buffer[BUFSIZ];
+
+    reflector_t reflector = {
+        .input_part = ALPHABET_SORTED,
+        .output_part = ALPHABET_REVERSED
+    };
+
+    rotor_t rotors[] = {
+        {
+            .period = 1,
+            .static_part = ALPHABET_SORTED,
+            .dynamic_part = ALPHABET_SORTED
+        },
+        {
+            .period = 2,
+            .static_part = ALPHABET_SORTED,
+            .dynamic_part = ALPHABET_SORTED
+        },
+        {
+            .period = 3,
+            .static_part = ALPHABET_SORTED,
+            .dynamic_part = ALPHABET_SORTED
+        }
+    };
+
+    enigma_t *enigma = enigma_new(reflector, rotors, sizeof(rotors)/sizeof(rotors[0]));
+
     for (int i = 1; i < argc; ++i) {
         len = strlen(argv[i]);
-        encrypt(buffer, argv[i], len);
-        buffer[len] = '\0';
-        printf("%s", buffer);
+        for (int j = 0; j < len; ++j) {
+            putchar(enigma_encrypt(enigma, argv[i][j]));
+        }
     }
-    printf("\n");
+    putchar('\n');
+    
+    enigma_free(enigma);
+
     return 0;
 }
 
-extern char *encrypt(char *output, const char *input, int size) {
-    int swt, temp;
+extern enigma_t *enigma_new(reflector_t reflector, rotor_t rotors[], int rotors_num) {
+    enigma_t *enigma = (enigma_t*)malloc(sizeof(enigma_t));
+    
+    enigma->counter = 0;
+    enigma->reflector = reflector;
+    enigma->rotors_num = rotors_num;
 
-    for (int i = 1; i < size+1; ++i) {
-        temp = input[i-1];
-
-        // Switches
-        swt = find_index(switches, temp, SWTNUM);
-        if (swt != -1) {
-            temp = switches[SWTNUM - swt - 1];
-        }
-
-        // Rotors encrypt ->
-        for (int j = 0; j < ROTNUM; ++j) {
-            temp = rotors[j][temp - 'A'];
-        }
-        
-        // Reflector
-        temp = ALPSIZ - 1 - find_index(reflector, temp, ALPSIZ);
-
-        // Rotors encrypt <-
-        for (int j = ROTNUM-1; j > -1; --j) {
-            temp = find_index(rotors[j], temp + 'A', ALPSIZ);
-        }
-
-        // Switches
-        temp += 'A';
-        swt = find_index(switches, temp, SWTNUM);
-        if (swt != -1) {
-            temp = switches[SWTNUM - swt - 1];
-        }
-
-        output[i-1] = temp;
-
-        // Shift rotors
-        for (int j = 0; j < ROTNUM; ++j) {
-            if (i % shfrot[j] == 0) {
-                shift_rotor(rotors[j], ALPSIZ);
-            }
-        }
+    enigma->rotors = (rotor_t*)malloc(sizeof(rotor_t)*rotors_num);
+    for (int i = 0; i < rotors_num; ++i) {
+        enigma->rotors[i] = rotors[i];
     }
-    return output;
+
+    return enigma;
 }
 
-static int find_index(char *rotor, char ch, int size) {
-    for (int j = 0; j < size; ++j) {
-        if (rotor[j] == ch) {
-            return j;
+extern void enigma_free(enigma_t *enigma) {
+    free(enigma->rotors);
+    free(enigma);
+}
+
+extern char enigma_encrypt(enigma_t *enigma, char ch) {
+    int index;
+
+    // rotors -> reflector
+    for (int i = 0; i < enigma->rotors_num; ++i) {
+        index = find_index(enigma->rotors[i].static_part, ALPHABET_SIZE, ch);
+        if (index == -1) {
+            continue;
+        }
+        ch = enigma->rotors[i].dynamic_part[index];
+    }
+
+    // reflector
+    index = find_index(enigma->reflector.input_part, ALPHABET_SIZE, ch);
+    if (index != -1) {
+        ch = enigma->reflector.output_part[index];  
+    }
+
+    // reflector -> rotors
+    for (int i = enigma->rotors_num-1; i >= 0; --i) {
+        index = find_index(enigma->rotors[i].dynamic_part, ALPHABET_SIZE, ch);
+        if (index == -1) {
+            continue;
+        }
+        ch = enigma->rotors[i].static_part[index];
+    }
+
+    // + new character
+    enigma->counter += 1;
+
+    // rotate shift right rotors
+    for (int i = 0; i < enigma->rotors_num; ++i) {
+        if (enigma->counter % enigma->rotors[i].period == 0) {
+            shift_right(enigma->rotors[i].dynamic_part, ALPHABET_SIZE);
+        }
+    }
+
+    return ch;
+}
+
+static void shift_right(char array[], int size) {
+    char temp = array[size-1];
+    for (int i = size-1; i > 0; --i) {
+        array[i] = array[i-1];
+    }
+    array[0] = temp;
+}
+
+static int find_index(char array[], int size, char ch) {
+    for (int i = 0; i < size; ++i) {
+        if (array[i] == ch) {
+            return i;
         }
     }
     return -1;
-}
-
-static void shift_rotor(char *rotor, int size) {
-    char temp = rotor[size-1];
-    for (int i = size-1; i > 0; --i) {
-        rotor[i] = rotor[i-1];
-    }
-    rotor[0] = temp;
 }
