@@ -32,6 +32,7 @@ static void shift_right(char array[], int size);
 static int find_index(char array[], int size, char ch);
 
 int main(int argc, char *argv[]) {
+    enigma_t *enigma;
     int len;
 
     reflector_t reflector = {
@@ -57,7 +58,7 @@ int main(int argc, char *argv[]) {
         }
     };
 
-    enigma_t *enigma = enigma_new(reflector, rotors, sizeof(rotors)/sizeof(rotors[0]));
+    enigma = enigma_new(reflector, rotors, sizeof(rotors)/sizeof(rotors[0]));
 
     for (int i = 1; i < argc; ++i) {
         len = strlen(argv[i]);
