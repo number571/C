@@ -3,35 +3,61 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#define CAESAR_KEY      3
-#define ALPHABET_SIZE   26
 #define ALPHABET_SORTED "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 typedef unsigned int uint;
+typedef unsigned char uchar;
 typedef struct {
-    char *alpha;
+    uchar *alpha;
     uint size;
     uint key;
 } caesar_t;
 
-extern caesar_t *caesar_new(uint key, char *alpha, uint size);
+extern caesar_t *caesar_new(uint key, uchar *alpha, uint size);
 extern void caesar_free(caesar_t *cipher);
 
-extern char caesar_encrypt(caesar_t *cipher, char ch);
-extern char caesar_decrypt(caesar_t *cipher, char ch);
-static int find_index(char array[], int size, char ch);
+extern uchar caesar_encrypt(caesar_t *cipher, uchar ch);
+extern uchar caesar_decrypt(caesar_t *cipher, uchar ch);
+static int find_index(uchar array[], uint size, uchar ch);
 
 int main(int argc, char *argv[]) {
     caesar_t *cipher;
-    uint encch;
+    uchar ch;
+    int mode;
     int len;
 
-    cipher = caesar_new(CAESAR_KEY, ALPHABET_SORTED, ALPHABET_SIZE);
+    if (argc < 4) {
+        fprintf(stderr, "use example: ./caesar [E|D] key message\n");
+        return 1;
+    }
 
-    for (int i = 1; i < argc; ++i) {
+    if (strcmp(argv[1], "E") == 0) {
+        mode = 1;
+    } else if (strcmp(argv[1], "D") == 0) {
+        mode = -1;
+    } else {
+        mode = 0;
+    }
+
+    if (mode == 0) {
+        fprintf(stderr, "undefined encryption mode\n");
+        return 2;
+    }
+
+    cipher = caesar_new(atoi(argv[2]), ALPHABET_SORTED, strlen(ALPHABET_SORTED));
+
+    for (int i = 3; i < argc; ++i) {
         len = strlen(argv[i]);
         for (int j = 0; j < len; ++j) {
-            putchar(caesar_encrypt(cipher, argv[i][j]));
+            switch (mode) {
+                case 1:
+                    ch = caesar_encrypt(cipher, argv[i][j]);
+                break;
+                case -1:
+                    ch = caesar_decrypt(cipher, argv[i][j]);
+                break;
+            }
+            putchar(ch);
         }
     }
     putchar('\n');
@@ -41,12 +67,12 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-extern caesar_t *caesar_new(uint key, char *alpha, uint size) {
+extern caesar_t *caesar_new(uint key, uchar *alpha, uint size) {
     caesar_t *cipher;
 
     cipher = (caesar_t*)malloc(sizeof(caesar_t));
 
-    cipher->alpha = (char*)malloc(sizeof(char)*size);
+    cipher->alpha = (uchar*)malloc(sizeof(uchar)*size);
     cipher->size = size;
     cipher->key = key % size;
 
@@ -60,7 +86,7 @@ extern void caesar_free(caesar_t *cipher) {
     free(cipher);
 }
 
-extern char caesar_encrypt(caesar_t *cipher, char ch) {
+extern uchar caesar_encrypt(caesar_t *cipher, uchar ch) {
     int index;
     index = find_index(cipher->alpha, cipher->size, ch);
     if (index == -1) {
@@ -70,7 +96,7 @@ extern char caesar_encrypt(caesar_t *cipher, char ch) {
     return cipher->alpha[index];
 }
 
-extern char caesar_decrypt(caesar_t *cipher, char ch) {
+extern uchar caesar_decrypt(caesar_t *cipher, uchar ch) {
     int index;
     index = find_index(cipher->alpha, cipher->size, ch);
     if (index == -1) {
@@ -80,7 +106,7 @@ extern char caesar_decrypt(caesar_t *cipher, char ch) {
     return cipher->alpha[index];
 }
 
-static int find_index(char array[], int size, char ch) {
+static int find_index(uchar array[], uint size, uchar ch) {
     for (int i = 0; i < size; ++i) {
         if (array[i] == ch) {
             return i;

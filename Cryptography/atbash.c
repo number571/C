@@ -2,26 +2,26 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define ALPHABET_SIZE   26
 #define ALPHABET_SORTED "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 typedef unsigned int uint;
+typedef unsigned char uchar;
 typedef struct {
-    char *alpha;
+    uchar *alpha;
     uint size;
 } atbash_t;
 
-extern atbash_t *atbash_new(char *alpha, uint size);
+extern atbash_t *atbash_new(uchar *alpha, uint size);
 extern void atbash_free(atbash_t *cipher);
 
-extern char atbash_encrypt(atbash_t *cipher, char ch);
-static int find_index(char array[], int size, char ch);
+extern uchar atbash_encrypt(atbash_t *cipher, uchar ch);
+static int find_index(uchar array[], uint size, uchar ch);
 
 int main(int argc, char *argv[]) {
     atbash_t *cipher;
     int len;
 
-    cipher = atbash_new(ALPHABET_SORTED, ALPHABET_SIZE);
+    cipher = atbash_new(ALPHABET_SORTED, strlen(ALPHABET_SORTED));
 
     for (int i = 1; i < argc; ++i) {
         len = strlen(argv[i]);
@@ -36,12 +36,12 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-extern atbash_t *atbash_new(char *alpha, uint size) {
+extern atbash_t *atbash_new(uchar *alpha, uint size) {
     atbash_t *cipher;
 
     cipher = (atbash_t*)malloc(sizeof(atbash_t));
 
-    cipher->alpha = (char*)malloc(sizeof(char)*size);
+    cipher->alpha = (uchar*)malloc(sizeof(uchar)*size);
     cipher->size = size;
 
     memcpy(cipher->alpha, alpha, size);
@@ -54,7 +54,7 @@ extern void atbash_free(atbash_t *cipher) {
     free(cipher);
 }
 
-extern char atbash_encrypt(atbash_t *cipher, char ch) {
+extern uchar atbash_encrypt(atbash_t *cipher, uchar ch) {
     int index;
     index = find_index(cipher->alpha, cipher->size, ch);
     if (index == -1) {
@@ -64,7 +64,7 @@ extern char atbash_encrypt(atbash_t *cipher, char ch) {
     return cipher->alpha[index];
 }
 
-static int find_index(char array[], int size, char ch) {
+static int find_index(uchar array[], uint size, uchar ch) {
     for (int i = 0; i < size; ++i) {
         if (array[i] == ch) {
             return i;
@@ -72,4 +72,3 @@ static int find_index(char array[], int size, char ch) {
     }
     return -1;
 }
-

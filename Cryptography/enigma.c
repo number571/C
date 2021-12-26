@@ -6,30 +6,33 @@
 #define ALPHABET_SORTED   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 #define ALPHABET_REVERSED "ZYXWVUTSRQPONMLKJIHGFEDCBA"
 
+typedef unsigned int uint;
+typedef unsigned char uchar;
+
 typedef struct rotor_t {
-    int period;
-    char static_part[ALPHABET_SIZE];
-    char dynamic_part[ALPHABET_SIZE];
+    uint period;
+    uchar static_part[ALPHABET_SIZE];
+    uchar dynamic_part[ALPHABET_SIZE];
 } rotor_t;
 
 typedef struct reflector_t {
-    char input_part[ALPHABET_SIZE];
-    char output_part[ALPHABET_SIZE];
+    uchar input_part[ALPHABET_SIZE];
+    uchar output_part[ALPHABET_SIZE];
 } reflector_t;
 
 typedef struct enigma_t {
-    int counter;
-    int rotors_num;
+    uint counter;
+    uint rotors_num;
     rotor_t *rotors;
     reflector_t reflector;
 } enigma_t;
 
-extern enigma_t *enigma_new(reflector_t reflector, rotor_t rotors[], int rotors_num);
+extern enigma_t *enigma_new(reflector_t reflector, rotor_t rotors[], uint rotors_num);
 extern void enigma_free(enigma_t *enigma);
-extern char enigma_encrypt(enigma_t *enigma, char ch);
+extern uchar enigma_encrypt(enigma_t *enigma, uchar ch);
 
-static void shift_right(char array[], int size);
-static int find_index(char array[], int size, char ch);
+static void shift_right(uchar array[], uint size);
+static int find_index(uchar array[], uint size, uchar ch);
 
 int main(int argc, char *argv[]) {
     enigma_t *enigma;
@@ -73,7 +76,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-extern enigma_t *enigma_new(reflector_t reflector, rotor_t rotors[], int rotors_num) {
+extern enigma_t *enigma_new(reflector_t reflector, rotor_t rotors[], uint rotors_num) {
     enigma_t *enigma = (enigma_t*)malloc(sizeof(enigma_t));
     
     enigma->counter = 0;
@@ -93,7 +96,7 @@ extern void enigma_free(enigma_t *enigma) {
     free(enigma);
 }
 
-extern char enigma_encrypt(enigma_t *enigma, char ch) {
+extern uchar enigma_encrypt(enigma_t *enigma, uchar ch) {
     int index;
 
     // rotors -> reflector
@@ -133,7 +136,7 @@ extern char enigma_encrypt(enigma_t *enigma, char ch) {
     return ch;
 }
 
-static void shift_right(char array[], int size) {
+static void shift_right(uchar array[], uint size) {
     char temp = array[size-1];
     for (int i = size-1; i > 0; --i) {
         array[i] = array[i-1];
@@ -141,7 +144,7 @@ static void shift_right(char array[], int size) {
     array[0] = temp;
 }
 
-static int find_index(char array[], int size, char ch) {
+static int find_index(uchar array[], uint size, uchar ch) {
     for (int i = 0; i < size; ++i) {
         if (array[i] == ch) {
             return i;
