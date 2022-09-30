@@ -77,7 +77,6 @@ int main(void) {
         (uint8_t[]){7, 6, 5, 4, 3, 2, 1, 0, 24, 23, 22, 21, 20, 25, 8, 9, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10},
     };
     enigma_s *enigma = enigma_new(size_alph, num_rotors);
-
     enigma_set_reflector(enigma, reflector);
     for (int i = 0; i < num_rotors; ++i) {
         enigma_set_rotor(enigma, i, rotors[i]);
@@ -98,6 +97,7 @@ int main(void) {
         // ENCODE
         enc_ch = encoder_encode(encoder, (uint8_t)ch, &flag);
         if (flag == 0) {
+            // just print unknown char
             putchar(ch);
             continue;
         }
@@ -105,15 +105,15 @@ int main(void) {
         // ENCRYPT/DECRYPT
         enc_ch = enigma_encrypt(enigma, enc_ch, &flag);
         if (flag == 0) {
-            // encoder put to encryption unknown code
-            continue; 
+            fprintf(stderr, "\nencoder put to enigma unknown code (%d)\n", enc_ch);
+            break; 
         }
 
         // DECODE
         dec_ch = encoder_decode(encoder, enc_ch, &flag);
         if (flag == 0) {
-            // enigma put to decoder unknown code
-            continue;
+            fprintf(stderr, "\nenigma put to decoder unknown code (%d)\n", enc_ch);
+            break;
         }
 
         putchar(dec_ch);
