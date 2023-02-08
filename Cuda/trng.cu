@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #define MODULE_N 2
-#define GRID_NUM ((1 << 16) - 1)
+#define CUDA_BLOCK_N 65535
 
 typedef uint8_t uint1_t;
 
@@ -33,7 +33,7 @@ void rand_uint1s(uint1_t *gamma, int n) {
   memset(raw_random, 0, sizeof(raw_random));
   cudaMalloc(&dev_r, sizeof(uint8_t));
   for (int i = 0; i < num_count; i++) {
-    rand_uintN<<<GRID_NUM, 1>>>(dev_r);
+    rand_uintN<<<CUDA_BLOCK_N, 1>>>(dev_r);
     cudaMemcpy(raw_random + i, dev_r, sizeof(uint8_t), cudaMemcpyDeviceToHost);
   }
   cudaFree(dev_r);
