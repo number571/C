@@ -13,7 +13,7 @@ void print_uint1s(uint1_t *gamma, int n);
 void print_uint1s_count(uint1_t *gamma, int n);
 
 int main() {
-  const int n = 256;
+  const int n = 1024;
   uint1_t gamma[n];
 
   rand_uint1s(gamma, n);
@@ -27,21 +27,21 @@ int main() {
 void rand_uint1s(uint1_t *gamma, int n) {
   const int num_count = n * MODULE_N;
 
-  uint8_t raw_random[num_count];
+  uint8_t raw_rand[num_count];
   uint8_t *dev_r;
 
-  memset(raw_random, 0, sizeof(raw_random));
+  memset(raw_rand, 0, sizeof(raw_rand));
   cudaMalloc(&dev_r, sizeof(uint8_t));
   for (int i = 0; i < num_count; i++) {
     rand_uintN<<<CUDA_BLOCK_N, 1>>>(dev_r);
-    cudaMemcpy(raw_random + i, dev_r, sizeof(uint8_t), cudaMemcpyDeviceToHost);
+    cudaMemcpy(raw_rand + i, dev_r, sizeof(uint8_t), cudaMemcpyDeviceToHost);
   }
   cudaFree(dev_r);
 
   for (int i = 0; i < num_count; i += MODULE_N) {
     int sum = 0;
     for (int j = 0; j < MODULE_N; ++j) {
-      sum += raw_random[i + j];
+      sum += raw_rand[i + j];
     }
     gamma[i / MODULE_N] = sum % 2;
   }
