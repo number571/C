@@ -1,3 +1,8 @@
+// GPUs and chaos: a new true random number generator
+// https://www.researchgate.net/profile/Je-Sen-Teh/publication/282478044_GPUs_and_chaos_a_new_true_random_number_generator/links/5c05de93a6fdcc315f9ae0f1/GPUs-and-chaos-a-new-true-random-number-generator.pdf
+
+// https://mzsoltmolnar.github.io/random-bitstream-tester/
+
 #include <stdint.h>
 #include <stdio.h>
 
@@ -12,10 +17,19 @@ void rand_uint1s(uint1_t *gamma, int n);
 void print_uint1s(uint1_t *gamma, int n);
 void print_uint1s_count(uint1_t *gamma, int n);
 
-int main() {
-  const int n = 1024;
-  uint1_t gamma[n];
+int main(int argc, char *argv[]) {
+  if (argc != 2) {
+    fprintf(stderr, "./main [num-bits]\n");
+    return 1;
+  }
 
+  int n = atoi(argv[1]);
+  if (n <= 0) {
+    fprintf(stderr, "[num-bits] should be > 0\n");
+    return 2;
+  }
+
+  uint1_t gamma[n];
   rand_uint1s(gamma, n);
 
   print_uint1s(gamma, n);
@@ -25,7 +39,7 @@ int main() {
 }
 
 void rand_uint1s(uint1_t *gamma, int n) {
-  const int num_count = n * MODULE_N;
+  int num_count = n * MODULE_N;
 
   uint8_t raw_rand[num_count];
   uint8_t *dev_r;
